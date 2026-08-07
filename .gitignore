@@ -1,0 +1,60 @@
+# Build outputs
+build/
+Build/
+build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# CMake artifacts
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+CMakeUserPresets.json
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Debug symbols
+*.pdb
+*.dwo
+
+# IDE / Editor
+.vscode/
+!.vscode/settings.json
+.idea/
+*.swp
+*.bak
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (pybind bindings)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Environment
+.env
+.envrc
+
+# Misc
+*.tmp
+*.log
+.cache

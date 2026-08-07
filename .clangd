@@ -1,0 +1,27 @@
+CompileFlags:
+  CompilationDatabase: build/debug
+  Remove:
+    - "-forward-unknown-to-host-compiler"
+    - "-arch=native"
+    - "-G"
+
+Diagnostics:
+  Suppress:
+    - "pp_file_not_found"
+  UnusedIncludes: None
+
+Index:
+  Background: Build
+
+
+---
+If:
+  PathMatch: .*\.(cu|cuh)$
+CompileFlags:
+  Add:
+    - "-xcuda"
+    - "--cuda-path=/usr/local/cuda"
+    - "--no-cuda-version-check"
+    - "-std=c++20"
+  Remove:
+    - "-Xcompiler=-fPIC"
