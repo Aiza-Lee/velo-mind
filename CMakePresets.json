@@ -49,6 +49,16 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
+        },
+        {
+            "name": "cpu-only",
+            "displayName": "CPU Only",
+            "description": "CPU-only build, force-disables CUDA even if the toolkit is installed",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/build/cpu-only",
+            "cacheVariables": {
+                "VELOMIND_ENABLE_CUDA": "OFF"
+            }
         }
     ],
     "buildPresets": [
@@ -66,6 +76,11 @@
             "name": "relwithdebinfo",
             "displayName": "Build (RelWithDebInfo)",
             "configurePreset": "relwithdebinfo"
+        },
+        {
+            "name": "cpu-only",
+            "displayName": "Build (CPU Only)",
+            "configurePreset": "cpu-only"
         }
     ]
 }

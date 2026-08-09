@@ -1,9 +1,12 @@
 CompileFlags:
-  CompilationDatabase: build/debug
   Remove:
     - "-forward-unknown-to-host-compiler"
     - "-arch=native"
     - "-G"
+    # GCC C++20/23 modules flags — not understood by clang
+    - "-fmodules-ts"
+    - "-fmodule-mapper=*"
+    - "-fdeps-format=*"
 
 Diagnostics:
   Suppress:

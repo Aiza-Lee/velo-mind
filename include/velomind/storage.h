@@ -10,6 +10,7 @@ public:
 	virtual auto data() -> void* = 0;
 	virtual auto data() const -> const void* = 0;
 	virtual auto device_type() const -> DeviceType = 0;
+	virtual auto size_bytes() const -> size_t = 0;
 };
 
 class VELOMIND_CORE_EXPORT CpuStorage : public IStorage {
@@ -20,7 +21,8 @@ public:
 	auto data() -> void* override { return _data_ptr; }
 	auto data() const -> const void* override { return _data_ptr; }
 	auto device_type() const -> DeviceType override { return DeviceType::CPU; }
-	
+	auto size_bytes() const -> size_t override { return _size_bytes; }
+
 private:
 	void* _data_ptr;
 	size_t _size_bytes;
@@ -34,6 +36,8 @@ public:
 	auto data() -> void* override { return _data_ptr; }
 	auto data() const -> const void* override { return _data_ptr; }
 	auto device_type() const -> DeviceType override { return DeviceType::CUDA; }
+	auto size_bytes() const -> size_t override { return _size_bytes; }
+
 private:
 	void* _data_ptr;
 	size_t _size_bytes;
