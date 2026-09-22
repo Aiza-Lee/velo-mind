@@ -1,0 +1,46 @@
+#version 450
+
+layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) readonly  buffer X       { float x[];       };
+layout(set = 0, binding = 1) readonly  buffer Weight  { float weight[];  };
+layout(set = 0, binding = 2) writeonly buffer Y       { float y[];       };
+
+layout(push_constant) uniform Params {
+    uint  rows;
+    uint  cols;
+    float eps;
+    uint  _pad;
+} params;
+
+shared float partial_sumsq[256];
+
+void main() {
+    uint row = gl_WorkGroupID.x;
+    uint tid = gl_LocalInvocationID.x;
+    if (row >= params.rows) return;
+
+    const uint cols = params.cols;
+    const uint row_off = row * cols;
+
+    float local_sumsq = 0.0f;
+    for (uint j = tid; j < cols; j += 256u) {
+        float v = x[row_off + j];
+        local_sumsq += v * v;
+    }
+    partial_sumsq[tid] = local_sumsq;
+    barrier();
+
+    for (uint stride = 128u; stride > 0u; stride >>= 1u) {
+        if (tid < stride) {
+            partial_sumsq[tid] += partial_sumsq[tid + stride];
+        }
+        barrier();
+    }
+    float mean_sq = partial_sumsq[0] / float(cols);
+    float inv_rms = inversesqrt(mean_sq + params.eps);
+
+    for (uint j = tid; j < cols; j += 256u) {
+        y[row_off + j] = x[row_off + j] * inv_rms * weight[j];
+    }
+}

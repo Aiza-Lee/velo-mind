@@ -1,0 +1,5 @@
+# 压制外部系统与 GPU 驱动运行时单例未释放导致的 LSan 假阳性
+leak:libdbus-1
+leak:libvulkan
+leak:libnvidia
+leak:libGLX

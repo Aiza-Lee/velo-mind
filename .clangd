@@ -3,7 +3,7 @@ CompileFlags:
     - "-forward-unknown-to-host-compiler"
     - "-arch=native"
     - "-G"
-    # GCC C++20/23 modules flags — not understood by clang
+    - "-Xcompiler=*"
     - "-fmodules-ts"
     - "-fmodule-mapper=*"
     - "-fdeps-format=*"
@@ -26,5 +26,3 @@ CompileFlags:
     - "--cuda-path=/usr/local/cuda"
     - "--no-cuda-version-check"
     - "-std=c++20"
-  Remove:
-    - "-Xcompiler=-fPIC"

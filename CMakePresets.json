@@ -14,8 +14,8 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "23",
-                "CMAKE_CUDA_STANDARD": "23",
-                "CMAKE_CUDA_ARCHITECTURES": "native",
+                "CMAKE_CUDA_STANDARD": "20",
+                "VELOMIND_CUDA_ARCHITECTURES": "89",
                 "CMAKE_CXX_FLAGS": "-Wall -Wextra"
             }
         },
@@ -27,17 +27,20 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
                 "CMAKE_CUDA_FLAGS": "-g -G"
             }
         },
         {
             "name": "release",
             "displayName": "Release",
-            "description": "Optimized release build",
+            "description": "Optimized release build with all backends",
             "inherits": "default",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+                "CMAKE_CUDA_FLAGS_RELEASE": "-O3 -DNDEBUG"
             }
         },
         {
@@ -47,17 +50,46 @@
             "inherits": "default",
             "binaryDir": "${sourceDir}/build/relwithdebinfo",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O3 -g -DNDEBUG"
             }
         },
         {
             "name": "cpu-only",
             "displayName": "CPU Only",
-            "description": "CPU-only build, force-disables CUDA even if the toolkit is installed",
+            "description": "Host-only build with ISPC and Vulkan, without CUDA",
             "inherits": "default",
             "binaryDir": "${sourceDir}/build/cpu-only",
             "cacheVariables": {
-                "VELOMIND_ENABLE_CUDA": "OFF"
+                "CMAKE_BUILD_TYPE": "Release",
+                "VELOMIND_ENABLE_CUDA": "OFF",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
+            }
+        },
+        {
+            "name": "pure-cpu",
+            "displayName": "Pure CPU",
+            "description": "Strict pure CPU build without CUDA, ISPC, or Vulkan accelerators",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/build/pure-cpu",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "VELOMIND_ENABLE_CUDA": "OFF",
+                "VELOMIND_ENABLE_ISPC": "OFF",
+                "VELOMIND_ENABLE_VULKAN": "OFF",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
+            }
+        },
+        {
+            "name": "asan",
+            "displayName": "ASan / UBSan",
+            "description": "AddressSanitizer and UndefinedBehaviorSanitizer debug build",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/build/asan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "VELOMIND_ENABLE_CUDA": "OFF",
+                "VELOMIND_ENABLE_ASAN": "ON"
             }
         }
     ],
@@ -65,22 +97,91 @@
         {
             "name": "debug",
             "displayName": "Build (Debug)",
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "jobs": 16
         },
         {
             "name": "release",
             "displayName": "Build (Release)",
-            "configurePreset": "release"
+            "configurePreset": "release",
+            "jobs": 16
         },
         {
             "name": "relwithdebinfo",
             "displayName": "Build (RelWithDebInfo)",
-            "configurePreset": "relwithdebinfo"
+            "configurePreset": "relwithdebinfo",
+            "jobs": 16
         },
         {
             "name": "cpu-only",
             "displayName": "Build (CPU Only)",
-            "configurePreset": "cpu-only"
+            "configurePreset": "cpu-only",
+            "jobs": 16
+        },
+        {
+            "name": "pure-cpu",
+            "displayName": "Build (Pure CPU)",
+            "configurePreset": "pure-cpu",
+            "jobs": 16
+        },
+        {
+            "name": "asan",
+            "displayName": "Build (ASan)",
+            "configurePreset": "asan",
+            "jobs": 16
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "release",
+            "displayName": "Test (Release)",
+            "configurePreset": "release",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Test (Debug)",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "relwithdebinfo",
+            "displayName": "Test (RelWithDebInfo)",
+            "configurePreset": "relwithdebinfo",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "cpu-only",
+            "displayName": "Test (CPU Only)",
+            "configurePreset": "cpu-only",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "pure-cpu",
+            "displayName": "Test (Pure CPU)",
+            "configurePreset": "pure-cpu",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "asan",
+            "displayName": "Test (ASan)",
+            "configurePreset": "asan",
+            "environment": {
+                "LSAN_OPTIONS": "suppressions=${sourceDir}/cmake/lsan_suppressions.txt"
+            },
+            "output": {
+                "outputOnFailure": true
+            }
         }
     ]
 }

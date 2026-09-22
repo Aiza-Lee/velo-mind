@@ -1,0 +1,33 @@
+#version 450
+
+layout(local_size_x = 64) in;
+
+layout(set = 0, binding = 0) readonly buffer InBuffer {
+    float x[];
+};
+
+layout(set = 0, binding = 1) writeonly buffer OutBuffer {
+    float y[];
+};
+
+layout(push_constant) uniform TransposeParams {
+    uint in_strides[8];
+    uint out_strides[8];
+    uint perm[8];
+    uint rank;
+    uint total;
+} p;
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >= p.total) return;
+
+    uint rem = idx;
+    uint in_flat = 0;
+    for (uint ax = 0; ax < p.rank; ++ax) {
+        uint coord = rem / p.out_strides[ax];
+        rem = rem % p.out_strides[ax];
+        in_flat += coord * p.in_strides[p.perm[ax]];
+    }
+    y[idx] = x[in_flat];
+}

@@ -1,0 +1,22 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) readonly  buffer Table   { float  table[];   };
+layout(set = 0, binding = 1) readonly  buffer Indices { int    indices[]; };
+layout(set = 0, binding = 2) writeonly buffer Output  { float  y[];       };
+
+layout(push_constant) uniform Params {
+    uint num_indices;
+    uint hidden;
+} params;
+
+void main() {
+    uint tid = gl_GlobalInvocationID.x;
+    uint total = params.num_indices * params.hidden;
+    if (tid >= total) return;
+    uint i = tid / params.hidden;
+    uint j = tid % params.hidden;
+    uint token = uint(indices[i]);
+    y[tid] = table[token * params.hidden + j];
+}

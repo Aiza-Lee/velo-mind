@@ -1,0 +1,60 @@
+#version 450
+
+layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) readonly  buffer X { float x[]; };
+layout(set = 0, binding = 1) writeonly buffer Y { float y[]; };
+
+layout(push_constant) uniform Params {
+    uint rows;
+    uint cols;
+    uint inner;
+} params;
+
+shared float row_buf[256];
+shared float partial_max[256];
+shared float partial_sum[256];
+
+void main() {
+    uint row = gl_WorkGroupID.x;
+    uint tid = gl_LocalInvocationID.x;
+    if (row >= params.rows) return;
+
+    const uint cols = params.cols;
+    const uint row_off = (row / params.inner) * cols * params.inner + row % params.inner;
+
+    float local_max = x[row_off];
+    for (uint j = tid; j < cols; j += 256u) {
+        float v = x[row_off + j * params.inner];
+        if (v > local_max) local_max = v;
+    }
+    partial_max[tid] = local_max;
+    barrier();
+    for (uint stride = 128u; stride > 0u; stride >>= 1u) {
+        if (tid < stride) {
+            float other = partial_max[tid + stride];
+            if (other > partial_max[tid]) partial_max[tid] = other;
+        }
+        barrier();
+    }
+    float row_max = partial_max[0];
+
+    float local_sum = 0.0f;
+    for (uint j = tid; j < cols; j += 256u) {
+        local_sum += exp(x[row_off + j * params.inner] - row_max);
+    }
+    partial_sum[tid] = local_sum;
+    barrier();
+    for (uint stride = 128u; stride > 0u; stride >>= 1u) {
+        if (tid < stride) {
+            partial_sum[tid] += partial_sum[tid + stride];
+        }
+        barrier();
+    }
+    float row_sum = partial_sum[0];
+    float inv_sum = 1.0f / row_sum;
+
+    for (uint j = tid; j < cols; j += 256u) {
+        y[row_off + j * params.inner] = exp(x[row_off + j * params.inner] - row_max) * inv_sum;
+    }
+}

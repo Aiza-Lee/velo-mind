@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "VeloMind Compute & Operator Capabilities Matrix",
+  "version": "0.2.0",
+  "updated_at": "2026-09-21T23:30:00Z",
+  "devices": [
+    {
+      "id": "CPU",
+      "name": "Host CPU Reference & Optimized SIMD",
+      "available": true,
+      "execution_dtypes": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+      "features": ["AVX2+FMA packed micro-panel GEMM", "M<=4 streaming decode GEMM", "Zero-copy transpose view", "FP16/BF16 mixed-precision & FP32 accumulation", "QuantizedMatMul AVX2+FMA row-streaming GEMV"]
+    },
+    {
+      "id": "ISPC",
+      "name": "Intel SPMD Program Compiler Runtime",
+      "available": true,
+      "execution_dtypes": ["Float32", "Int32", "Int8", "Bool"],
+      "features": ["TaskGroup thread budget concurrency", "Tiled 2D GEMM", "Inline serial bypass for small tokens"]
+    },
+    {
+      "id": "CUDA",
+      "name": "NVIDIA CUDA Hardware Backend",
+      "available": true,
+      "execution_dtypes": ["Float32", "Int32", "Int8", "Float16", "BFloat16"],
+      "features": ["cuBLAS strided batched GEMM", "Asynchronous stream dispatch", "Graph lifetime context binding", "FP16/BF16 mixed GEMM with FP32 accumulation", "QuantizedMatMul Warp-level GEMV & 2D GEMM"]
+    },
+    {
+      "id": "VULKAN",
+      "name": "Vulkan Cross-Vendor GPU Compute",
+      "available": true,
+      "execution_dtypes": ["Float32", "Int32", "Int8", "Bool"],
+      "features": ["Device-side compute shaders", "Scoped batch command recording", "Dynamic 5-tier shader resolution"]
+    }
+  ],
+  "operators": [
+    {
+      "op": "Add",
+      "category": "Elementwise",
+      "inputs": 2,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Sub",
+      "category": "Elementwise",
+      "inputs": 2,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Mul",
+      "category": "Elementwise",
+      "inputs": 2,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Div",
+      "category": "Elementwise",
+      "inputs": 2,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Neg",
+      "category": "ElementwiseUnary",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Abs",
+      "category": "ElementwiseUnary",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Relu",
+      "category": "ElementwiseUnary",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Sigmoid",
+      "category": "ElementwiseUnary",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Tanh",
+      "category": "ElementwiseUnary",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "Softmax",
+      "category": "Normalization",
+      "inputs": 1,
+      "attrs": "SoftmaxAttrs { axis: int = -1 }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "MatMul",
+      "category": "LinearAlgebra",
+      "inputs": 2,
+      "attrs": "MatMulAttrs { trans_a: bool = false, trans_b: bool = false }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16", "Mixed:Float32/Float16", "Mixed:Float32/BFloat16"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32", "Float16", "BFloat16", "Mixed:Float32/Float16", "Mixed:Float32/BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Reshape",
+      "category": "ShapeManipulation",
+      "inputs": 1,
+      "attrs": "ReshapeAttrs { shape: vector<int64> }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32", "Int32", "Int8", "Bool"],
+        "CUDA": ["Float32", "Int32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Transpose",
+      "category": "ShapeManipulation",
+      "inputs": 1,
+      "attrs": "TransposeAttrs { perm: vector<int> }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Concat",
+      "category": "ShapeManipulation",
+      "inputs": 2,
+      "attrs": "ConcatAttrs { axis: int = 0 }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32", "Int32", "Int8", "Bool"],
+        "CUDA": ["Float32", "Int32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32", "Int32", "Int8", "Bool"]
+      }
+    },
+    {
+      "op": "Slice",
+      "category": "ShapeManipulation",
+      "inputs": 1,
+      "attrs": "SliceAttrs { begins: vector<int>, ends: vector<int>, strides: vector<int> }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32", "Int32", "Int8", "Bool"],
+        "CUDA": ["Float32", "Int32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Rsqrt",
+      "category": "Math",
+      "inputs": 1,
+      "attrs": "None",
+      "backends": {
+        "CPU": ["Float32"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "RMSNorm",
+      "category": "Normalization",
+      "inputs": 2,
+      "attrs": "RMSNormAttrs { epsilon: float = 1e-5, axis: int = -1 }",
+      "backends": {
+        "CPU": ["Float32", "Float16", "BFloat16", "Mixed:Float32/Float16", "Mixed:Float32/BFloat16"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32", "Float16", "BFloat16", "Mixed:Float32/Float16", "Mixed:Float32/BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "Embedding",
+      "category": "LinearAlgebra",
+      "inputs": 2,
+      "attrs": "None",
+      "input_dtypes": ["Table: Float32", "Indices: Int32"],
+      "backends": {
+        "CPU": ["Float32"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "RotaryEmbedding",
+      "category": "Attention",
+      "inputs": 3,
+      "attrs": "None",
+      "input_dtypes": ["Input: Float32", "Cos: Float32", "Sin: Float32"],
+      "backends": {
+        "CPU": ["Float32"],
+        "ISPC": ["Float32"],
+        "CUDA": ["Float32"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "RepeatKV",
+      "category": "Attention",
+      "inputs": 1,
+      "attrs": "RepeatKVAttrs { repeats: int = 1, axis: int = 0 }",
+      "backends": {
+        "CPU": ["Float32", "Int32", "Int8", "Bool", "Float16", "BFloat16"],
+        "ISPC": ["Float32", "Int32", "Int8", "Bool"],
+        "CUDA": ["Float32", "Float16", "BFloat16"],
+        "VULKAN": ["Float32"]
+      }
+    },
+    {
+      "op": "FusedAttention",
+      "category": "Attention",
+      "inputs": 3,
+      "attrs": "FusedAttentionAttrs { scale: float = 1.0, is_causal: bool = true }",
+      "backends": {
+        "CPU": ["Float32", "Float16", "BFloat16"],
+        "ISPC": [],
+        "CUDA": ["Float32", "Float16", "BFloat16"],
+        "VULKAN": []
+      }
+    },
+    {
+      "op": "QuantizedMatMul",
+      "category": "LinearAlgebra",
+      "inputs": 3,
+      "attrs": "QuantizedMatMulAttrs { quant_type: QuantType = Int8, block_size: int = 32 }",
+      "input_dtypes": ["Activation: Float32/Float16/BFloat16", "Weights: Int8", "Scales: Float32/Float16/BFloat16"],
+      "backends": {
+        "CPU": ["Float32", "Float16", "BFloat16"],
+        "ISPC": [],
+        "CUDA": ["Float32", "Float16", "BFloat16"],
+        "VULKAN": []
+      }
+    }
+  ],
+  "model_coverage": [
+    {
+      "name": "SmolLM2-135M",
+      "type": "LlamaForCausalLM",
+      "architecture": "SwiGLU + RoPE + RMSNorm + GQA (9 Q-heads, 3 KV-heads)",
+      "weights": "safetensors (Float32 / Float16)",
+      "backends": ["CPU", "ISPC", "CUDA", "VULKAN"],
+      "capabilities": ["5-token prefill", "multi-step autoregressive decode", "KV-cache incremental decode", "last-token-only logits", "INT8 symmetric per-channel quantization", "INT4 blocked quantization"]
+    },
+    {
+      "name": "TinyLlama-1.1B",
+      "type": "LlamaForCausalLM",
+      "architecture": "SwiGLU + RoPE + RMSNorm + GQA (32 Q-heads, 4 KV-heads)",
+      "weights": "safetensors + sentencepiece tokenizer",
+      "backends": ["CPU", "ISPC", "CUDA", "VULKAN"],
+      "capabilities": ["5-token prefill", "multi-step autoregressive decode", "KV-cache incremental decode", "last-token-only logits", "INT8 symmetric per-channel quantization", "INT4 blocked quantization"]
+    },
+    {
+      "name": "ToyLlama-SelfContained",
+      "type": "LlamaForCausalLM",
+      "architecture": "SwiGLU + RoPE + RMSNorm + GQA (4 Q-heads, 2 KV-heads, 2 layers)",
+      "weights": "tests/testdata/toy_llama/ (Float32)",
+      "backends": ["CPU", "ISPC", "CUDA", "VULKAN"],
+      "capabilities": ["self-contained offline CI verification", "end-to-end INT8 quantized inference", "100% argmax alignment vs float reference"]
+    }
+  ]
+}

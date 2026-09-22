@@ -1,0 +1,9 @@
+[submodule "third_party/catch2"]
+	path = third_party/catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "third_party/sentencepiece"]
+	path = third_party/sentencepiece
+	url = https://github.com/google/sentencepiece.git
+[submodule "third_party/tokenizers-cpp"]
+	path = third_party/tokenizers-cpp
+	url = https://github.com/mlc-ai/tokenizers-cpp.git

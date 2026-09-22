@@ -1,0 +1,65 @@
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) readonly  buffer A { float a[]; };
+layout(set = 0, binding = 1) readonly  buffer B { float b[]; };
+layout(set = 0, binding = 2) writeonly buffer C { float c[]; };
+
+layout(push_constant) uniform Params {
+    uint M;
+    uint N;
+    uint K;
+    uint a_off;
+    uint b_off;
+    uint c_off;
+} params;
+
+const uint TILE_M = 16u;
+const uint TILE_N = 16u;
+const uint TILE_K = 16u;
+
+shared float tileA[TILE_M][TILE_K];
+shared float tileB[TILE_K][TILE_N];
+
+void main() {
+    uint tx = gl_LocalInvocationID.x;
+    uint ty = gl_LocalInvocationID.y;
+    uint row = gl_WorkGroupID.y * TILE_M + ty;
+    uint col = gl_WorkGroupID.x * TILE_N + tx;
+
+    const uint lda = params.K;
+    const uint ldb = params.N;
+    const uint ldc = params.N;
+
+    float acc = 0.0f;
+    uint num_k_tiles = (params.K + TILE_K - 1u) / TILE_K;
+    for (uint t = 0u; t < num_k_tiles; ++t) {
+        uint k_base = t * TILE_K;
+
+        uint a_col = k_base + tx;
+        if (row < params.M && a_col < params.K) {
+            tileA[ty][tx] = a[params.a_off + row * lda + a_col];
+        } else {
+            tileA[ty][tx] = 0.0f;
+        }
+
+        uint b_row = k_base + ty;
+        if (b_row < params.K && col < params.N) {
+            tileB[ty][tx] = b[params.b_off + b_row * ldb + col];
+        } else {
+            tileB[ty][tx] = 0.0f;
+        }
+
+        barrier();
+
+        for (uint k = 0u; k < TILE_K; ++k) {
+            acc += tileA[ty][k] * tileB[k][tx];
+        }
+        barrier();
+    }
+
+    if (row < params.M && col < params.N) {
+        c[params.c_off + row * ldc + col] = acc;
+    }
+}

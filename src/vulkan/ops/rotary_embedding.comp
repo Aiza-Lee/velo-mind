@@ -1,0 +1,33 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) readonly  buffer X     { float x[];     };
+layout(set = 0, binding = 1) readonly  buffer Cos   { float cos_c[]; };
+layout(set = 0, binding = 2) readonly  buffer Sin   { float sin_c[]; };
+layout(set = 0, binding = 3) writeonly buffer Y     { float y[];     };
+
+layout(push_constant) uniform Params {
+    uint rows;
+    uint head_dim;
+    uint cos_rows;
+} params;
+
+void main() {
+    uint gid = gl_GlobalInvocationID.x;
+    uint half_dim = params.head_dim / 2u;
+    uint total = params.rows * half_dim;
+    if (gid >= total) return;
+
+    uint row = gid / half_dim;
+    uint j   = gid % half_dim;
+
+    uint pos = (params.cos_rows > 1u) ? (row % params.cos_rows) : 0u;
+
+    float a = x[row * params.head_dim + j];
+    float b = x[row * params.head_dim + j + half_dim];
+    float c = cos_c[pos * half_dim + j];
+    float s = sin_c[pos * half_dim + j];
+    y[row * params.head_dim + j]             = a * c - b * s;
+    y[row * params.head_dim + j + half_dim] = b * c + a * s;
+}
