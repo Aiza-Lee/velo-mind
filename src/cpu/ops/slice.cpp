@@ -109,12 +109,12 @@ void slice_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Slice, slice_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Slice, slice_impl);
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Slice,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Slice,
                                DataType::Float16, DataType::Float16,
                                slice_impl);
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Slice,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Slice,
                                DataType::BFloat16, DataType::BFloat16,
                                slice_impl);
 

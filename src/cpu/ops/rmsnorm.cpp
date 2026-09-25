@@ -59,21 +59,21 @@ void rmsnorm_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::RMSNorm,
                                 DataType::Float32, DataType::Float32,
                                 DataType::Float32, rmsnorm_impl);
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::RMSNorm,
                                 DataType::Float16, DataType::Float16,
                                 DataType::Float16, rmsnorm_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::RMSNorm,
                                 DataType::Float32, DataType::Float16,
                                 DataType::Float32, rmsnorm_impl);
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::RMSNorm,
                                 DataType::BFloat16, DataType::BFloat16,
                                 DataType::BFloat16, rmsnorm_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::RMSNorm,
                                 DataType::Float32, DataType::BFloat16,
                                 DataType::Float32, rmsnorm_impl);
 

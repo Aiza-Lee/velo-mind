@@ -30,7 +30,7 @@ void mul_ispc_impl(const TensorStorage* const* in,
     mul_f32_ispc(const_cast<float*>(a), const_cast<float*>(b), c, n);
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::ISPC, Op::Mul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::ISPC, Op::Mul,
                                 DataType::Float32, DataType::Float32,
                                 DataType::Float32, mul_ispc_impl)
 

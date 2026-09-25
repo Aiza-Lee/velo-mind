@@ -26,7 +26,7 @@ void rsqrt_impl(const TensorStorage* const* in, TensorStorage* const* out,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Rsqrt,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Rsqrt,
                                DataType::Float32, DataType::Float32,
                                rsqrt_impl)
 

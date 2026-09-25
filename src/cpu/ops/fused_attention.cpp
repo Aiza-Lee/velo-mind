@@ -137,23 +137,7 @@ void fused_attention_impl(const TensorStorage* const* in,
     }
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_f32(
-    DeviceType::CPU, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32, DataType::Float32, DataType::Float32 }, 3, DataType::Float32 },
-    &fused_attention_impl<float>);
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_f16(
-    DeviceType::CPU, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16, DataType::Float16, DataType::Float16 }, 3, DataType::Float16 },
-    &fused_attention_impl<float16_t>);
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_bf16(
-    DeviceType::CPU, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16, DataType::BFloat16, DataType::BFloat16 }, 3, DataType::BFloat16 },
-    &fused_attention_impl<bfloat16_t>);
+VELOMIND_REGISTER_TERNARY_SAME_1T_FLOATS(DeviceType::CPU, Op::FusedAttention, fused_attention_impl);
 
 } // namespace
 

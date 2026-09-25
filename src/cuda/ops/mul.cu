@@ -31,12 +31,6 @@ void mul_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     check_cuda_kernel(Op::Mul, *out[0]);
 }
 
-namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_mul_f32(
-        DeviceType::CUDA, Op::Mul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&mul_impl<float>));
-}
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Mul, DataType::Float32, mul_impl);
 
 }

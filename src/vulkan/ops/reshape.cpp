@@ -32,16 +32,7 @@ namespace {
         std::memcpy(y, x, n_in * sizeof(float));
     }
 
-    static ::velomind::internal::KernelRegistrar
-        _velomind_kr_reshape_f32_vk(
-            DeviceType::VULKAN,
-            Op::Reshape,
-            ::velomind::internal::KernelDtypeKey{
-                { DataType::Float32 },
-                1,
-                DataType::Float32
-            },
-            static_cast<Executable::KernelFn>(&reshape_impl));
+    VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::Reshape, DataType::Float32, DataType::Float32, &reshape_impl);
 
 }
 

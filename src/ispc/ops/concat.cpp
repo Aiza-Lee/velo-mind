@@ -71,7 +71,7 @@ void concat_ispc_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::ISPC, Op::Concat, concat_ispc_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::ISPC, Op::Concat, concat_ispc_impl);
 
 }
 

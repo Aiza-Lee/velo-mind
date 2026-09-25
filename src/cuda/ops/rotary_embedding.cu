@@ -68,11 +68,11 @@ void rotary_embedding_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::RotaryEmbedding, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_rotary_embedding(
+VELOMIND_REGISTER_TERNARY_OP(
     DeviceType::CUDA, Op::RotaryEmbedding,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32, DataType::Float32, DataType::Float32 }, 3, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&rotary_embedding_impl<float, float, float>));
+    DataType::Float32, DataType::Float32, DataType::Float32, DataType::Float32,
+    rotary_embedding_impl);
+
 
 }
 

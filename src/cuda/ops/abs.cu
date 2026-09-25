@@ -30,12 +30,6 @@ void abs_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     check_cuda_kernel(Op::Abs, *out[0]);
 }
 
-namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_abs_f32(
-        DeviceType::CUDA, Op::Abs,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 }, 1, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&abs_impl<float>));
-}
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Abs, DataType::Float32, abs_impl);
 
 }

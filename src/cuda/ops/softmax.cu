@@ -67,23 +67,7 @@ void softmax_impl(const TensorStorage* const* in, TensorStorage* const* out, con
 }
 
 namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_softmax_f32(
-        DeviceType::CUDA, Op::Softmax,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 }, 1, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&softmax_impl<float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_softmax_f16(
-        DeviceType::CUDA, Op::Softmax,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float16 }, 1, DataType::Float16 },
-        static_cast<Executable::KernelFn>(&softmax_impl<float16_t>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_softmax_bf16(
-        DeviceType::CUDA, Op::Softmax,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::BFloat16 }, 1, DataType::BFloat16 },
-        static_cast<Executable::KernelFn>(&softmax_impl<bfloat16_t>));
+    VELOMIND_REGISTER_UNARY_1T_FLOATS(DeviceType::CUDA, Op::Softmax, softmax_impl);
 }
 
 }

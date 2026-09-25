@@ -73,23 +73,8 @@ void repeat_kv_cuda_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::RepeatKV, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_repeat_kv_f32(
-    DeviceType::CUDA, Op::RepeatKV,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32 }, 1, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&repeat_kv_cuda_impl<float>));
+VELOMIND_REGISTER_UNARY_1T_FLOATS(DeviceType::CUDA, Op::RepeatKV, repeat_kv_cuda_impl);
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_repeat_kv_f16(
-    DeviceType::CUDA, Op::RepeatKV,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16 }, 1, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&repeat_kv_cuda_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_repeat_kv_bf16(
-    DeviceType::CUDA, Op::RepeatKV,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16 }, 1, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&repeat_kv_cuda_impl<bfloat16_t>));
 
 }
 

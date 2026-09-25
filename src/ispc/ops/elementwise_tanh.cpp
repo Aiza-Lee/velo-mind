@@ -29,7 +29,7 @@ void tanh_ispc_impl(const TensorStorage* const* in,
     tanh_f32_ispc(const_cast<float*>(x), y, n);
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Tanh,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Tanh,
                                DataType::Float32, DataType::Float32,
                                tanh_ispc_impl)
 

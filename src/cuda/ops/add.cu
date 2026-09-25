@@ -10,17 +10,17 @@
 
 namespace velomind::backend::cuda {
 
-template <typename T>
-__global__ void add_kernel(const T* a, const T* b, T* c, std::size_t n) {
+template <typename T1, typename T2, typename T3>
+__global__ void add_kernel(const T1* a, const T2* b, T3* c, std::size_t n) {
     std::size_t i = static_cast<std::size_t>(blockIdx.x) * blockDim.x + threadIdx.x;
-    if (i < n) c[i] = a[i] + b[i];
+    if (i < n) c[i] = static_cast<T3>(a[i] + b[i]);
 }
 
-template <typename T>
+template <typename T1, typename T2, typename T3>
 void add_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
-    const T* a = static_cast<const T*>(in[0]->data);
-    const T* b = static_cast<const T*>(in[1]->data);
-    T*       c = static_cast<T*>(out[0]->data);
+    const T1* a = static_cast<const T1*>(in[0]->data);
+    const T2* b = static_cast<const T2*>(in[1]->data);
+    T3*       c = static_cast<T3*>(out[0]->data);
     auto      n = storage_numel(*out[0]);
 
     if (n == 0) return;
@@ -32,16 +32,10 @@ void add_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     check_cuda_kernel(Op::Add, *out[0]);
 }
 
-namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_add_f32(
-        DeviceType::CUDA,
-        Op::Add,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 },
-            2,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&add_impl<float>));
-}
+VELOMIND_REGISTER_BINARY_SAME(
+    DeviceType::CUDA,
+    Op::Add,
+    add_impl
+);
 
 }

@@ -29,7 +29,7 @@ void sigmoid_ispc_impl(const TensorStorage* const* in,
     sigmoid_f32_ispc(const_cast<float*>(x), y, n);
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Sigmoid,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Sigmoid,
                                DataType::Float32, DataType::Float32,
                                sigmoid_ispc_impl)
 

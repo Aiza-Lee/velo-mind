@@ -38,29 +38,8 @@ void reshape_impl(const TensorStorage* const* in,
     }
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_reshape_f32(
-    DeviceType::CUDA, Op::Reshape,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32 }, 1, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&reshape_impl<float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_reshape_f16(
-    DeviceType::CUDA, Op::Reshape,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16 }, 1, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&reshape_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_reshape_bf16(
-    DeviceType::CUDA, Op::Reshape,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16 }, 1, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&reshape_impl<bfloat16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_reshape_i32(
-    DeviceType::CUDA, Op::Reshape,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Int32 }, 1, DataType::Int32 },
-    static_cast<Executable::KernelFn>(&reshape_impl<std::int32_t>));
+VELOMIND_REGISTER_UNARY_1T_FLOATS(DeviceType::CUDA, Op::Reshape, reshape_impl);
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Reshape, DataType::Int32, reshape_impl);
 
 }
 

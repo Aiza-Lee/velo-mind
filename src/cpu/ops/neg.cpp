@@ -24,7 +24,7 @@ void neg_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Neg, neg_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Neg, neg_impl);
 
 }
 

@@ -31,12 +31,6 @@ void div_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     check_cuda_kernel(Op::Div, *out[0]);
 }
 
-namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_div_f32(
-        DeviceType::CUDA, Op::Div,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&div_impl<float>));
-}
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Div, DataType::Float32, div_impl);
 
 }

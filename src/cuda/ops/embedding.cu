@@ -51,12 +51,7 @@ void embedding_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::Embedding, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_embedding_f32(
-    DeviceType::CUDA, Op::Embedding,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32, DataType::Int32 }, 2, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&embedding_impl<float, std::int32_t, float>));
-
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::Embedding, DataType::Float32, DataType::Int32, DataType::Float32, embedding_impl);
 }
 
 }

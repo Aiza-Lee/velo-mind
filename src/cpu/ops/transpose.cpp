@@ -67,12 +67,12 @@ void transpose_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Transpose, transpose_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Transpose, transpose_impl);
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Transpose,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Transpose,
                                DataType::Float16, DataType::Float16,
                                transpose_impl);
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Transpose,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Transpose,
                                DataType::BFloat16, DataType::BFloat16,
                                transpose_impl);
 

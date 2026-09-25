@@ -32,11 +32,7 @@ void sub_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
 }
 
 namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_sub_f32(
-        DeviceType::CUDA, Op::Sub,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&sub_impl<float>));
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Sub, DataType::Float32, sub_impl);
 }
 
 }

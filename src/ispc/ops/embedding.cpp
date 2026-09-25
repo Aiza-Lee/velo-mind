@@ -35,7 +35,7 @@ void embedding_ispc_impl(const TensorStorage* const* in,
                            static_cast<int>(num_idx));
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::ISPC, Op::Embedding,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::ISPC, Op::Embedding,
                                 DataType::Float32, DataType::Int32,
                                 DataType::Float32, embedding_ispc_impl)
 

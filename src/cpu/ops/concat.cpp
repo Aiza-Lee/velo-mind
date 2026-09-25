@@ -71,12 +71,12 @@ void concat_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::CPU, Op::Concat, concat_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::CPU, Op::Concat, concat_impl);
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::Concat,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::Concat,
                                 DataType::Float16, DataType::Float16, DataType::Float16,
                                 concat_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::Concat,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::Concat,
                                 DataType::BFloat16, DataType::BFloat16, DataType::BFloat16,
                                 concat_impl);
 

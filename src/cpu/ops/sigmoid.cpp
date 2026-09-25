@@ -26,7 +26,7 @@ void sigmoid_impl(const TensorStorage* const* in, TensorStorage* const* out, con
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Sigmoid, sigmoid_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Sigmoid, sigmoid_impl);
 
 }
 

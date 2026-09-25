@@ -30,7 +30,7 @@ void rsqrt_ispc_impl(const TensorStorage* const* in,
     rsqrt_f32_ispc(x, y, static_cast<int>(n));
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Rsqrt,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Rsqrt,
                                DataType::Float32, DataType::Float32,
                                rsqrt_ispc_impl);
 

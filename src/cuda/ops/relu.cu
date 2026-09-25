@@ -30,12 +30,6 @@ void relu_impl(const TensorStorage* const* in, TensorStorage* const* out, const 
     check_cuda_kernel(Op::Relu, *out[0]);
 }
 
-namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_relu_f32(
-        DeviceType::CUDA, Op::Relu,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 }, 1, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&relu_impl<float>));
-}
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Relu, DataType::Float32, relu_impl);
 
 }

@@ -191,15 +191,7 @@ namespace {
         guard.finish(Op::Mul, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_mul_f32_vk(
-        DeviceType::VULKAN,
-        Op::Mul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 },
-            2,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&mul_impl));
+VELOMIND_REGISTER_BINARY_FN(DeviceType::VULKAN, Op::Mul, DataType::Float32, DataType::Float32, DataType::Float32, &mul_impl);
 
 }
 

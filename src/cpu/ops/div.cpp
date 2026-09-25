@@ -25,7 +25,7 @@ void div_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::CPU, Op::Div, div_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::CPU, Op::Div, div_impl);
 
 }
 

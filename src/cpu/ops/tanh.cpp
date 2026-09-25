@@ -25,7 +25,7 @@ void tanh_impl(const TensorStorage* const* in, TensorStorage* const* out, const 
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Tanh, tanh_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Tanh, tanh_impl);
 
 }
 

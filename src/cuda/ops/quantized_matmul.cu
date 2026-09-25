@@ -265,35 +265,11 @@ void quantized_matmul_cuda_impl(
     check_cuda_kernel(Op::QuantizedMatMul, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_qmatmul_cuda_f32_f32(
-    DeviceType::CUDA, Op::QuantizedMatMul,
-    ::velomind::internal::KernelDtypeKey{
-        {DataType::Float32, DataType::Int8, DataType::Float32}, 3, DataType::Float32},
-    static_cast<Executable::KernelFn>(&quantized_matmul_cuda_impl<float, float, float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_qmatmul_cuda_f16_f16(
-    DeviceType::CUDA, Op::QuantizedMatMul,
-    ::velomind::internal::KernelDtypeKey{
-        {DataType::Float16, DataType::Int8, DataType::Float16}, 3, DataType::Float16},
-    static_cast<Executable::KernelFn>(&quantized_matmul_cuda_impl<float16_t, float16_t, float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_qmatmul_cuda_f16_f32(
-    DeviceType::CUDA, Op::QuantizedMatMul,
-    ::velomind::internal::KernelDtypeKey{
-        {DataType::Float16, DataType::Int8, DataType::Float32}, 3, DataType::Float16},
-    static_cast<Executable::KernelFn>(&quantized_matmul_cuda_impl<float16_t, float, float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_qmatmul_cuda_bf16_bf16(
-    DeviceType::CUDA, Op::QuantizedMatMul,
-    ::velomind::internal::KernelDtypeKey{
-        {DataType::BFloat16, DataType::Int8, DataType::BFloat16}, 3, DataType::BFloat16},
-    static_cast<Executable::KernelFn>(&quantized_matmul_cuda_impl<bfloat16_t, bfloat16_t, bfloat16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_qmatmul_cuda_bf16_f32(
-    DeviceType::CUDA, Op::QuantizedMatMul,
-    ::velomind::internal::KernelDtypeKey{
-        {DataType::BFloat16, DataType::Int8, DataType::Float32}, 3, DataType::BFloat16},
-    static_cast<Executable::KernelFn>(&quantized_matmul_cuda_impl<bfloat16_t, float, bfloat16_t>));
+VELOMIND_REGISTER_QUANTIZED_MATMUL(DeviceType::CUDA, DataType::Float32,  DataType::Float32,  DataType::Float32,  quantized_matmul_cuda_impl);
+VELOMIND_REGISTER_QUANTIZED_MATMUL(DeviceType::CUDA, DataType::Float16,  DataType::Float16,  DataType::Float16,  quantized_matmul_cuda_impl);
+VELOMIND_REGISTER_QUANTIZED_MATMUL(DeviceType::CUDA, DataType::Float16,  DataType::Float32,  DataType::Float16,  quantized_matmul_cuda_impl);
+VELOMIND_REGISTER_QUANTIZED_MATMUL(DeviceType::CUDA, DataType::BFloat16, DataType::BFloat16, DataType::BFloat16, quantized_matmul_cuda_impl);
+VELOMIND_REGISTER_QUANTIZED_MATMUL(DeviceType::CUDA, DataType::BFloat16, DataType::Float32,  DataType::BFloat16, quantized_matmul_cuda_impl);
 
 } // namespace
 

@@ -110,16 +110,7 @@ void slice_impl(const TensorStorage* const* in,
     }
 }
 
-static ::velomind::internal::KernelRegistrar
-    _velomind_kr_slice_f32_vk(
-        DeviceType::VULKAN,
-        Op::Slice,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 },
-            1,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&slice_impl));
+VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::Slice, DataType::Float32, DataType::Float32, &slice_impl);
 
 } // namespace
 

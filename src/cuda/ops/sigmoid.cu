@@ -31,11 +31,7 @@ void sigmoid_impl(const TensorStorage* const* in, TensorStorage* const* out, con
 }
 
 namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_sigmoid_f32(
-        DeviceType::CUDA, Op::Sigmoid,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 }, 1, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&sigmoid_impl<float>));
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Sigmoid, DataType::Float32, sigmoid_impl);
 }
 
 }

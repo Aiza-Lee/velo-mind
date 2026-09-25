@@ -101,23 +101,7 @@ void transpose_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::Transpose, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_transpose_f32(
-    DeviceType::CUDA, Op::Transpose,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32 }, 1, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&transpose_impl<float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_transpose_f16(
-    DeviceType::CUDA, Op::Transpose,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16 }, 1, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&transpose_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_transpose_bf16(
-    DeviceType::CUDA, Op::Transpose,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16 }, 1, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&transpose_impl<bfloat16_t>));
+VELOMIND_REGISTER_UNARY_1T_FLOATS(DeviceType::CUDA, Op::Transpose, transpose_impl);
 
 }
 

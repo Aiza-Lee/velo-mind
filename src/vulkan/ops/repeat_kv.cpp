@@ -61,16 +61,7 @@ void repeat_kv_impl(const TensorStorage* const* in,
     }
 }
 
-static ::velomind::internal::KernelRegistrar
-    _velomind_kr_repeat_kv_f32_vk(
-        DeviceType::VULKAN,
-        Op::RepeatKV,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 },
-            1,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&repeat_kv_impl));
+VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::RepeatKV, DataType::Float32, DataType::Float32, &repeat_kv_impl);
 
 }
 

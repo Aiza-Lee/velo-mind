@@ -14,6 +14,7 @@
 #include "velomind.h"
 
 #include "test_helpers.h"
+#include "internal/registry/kernel.h"
 
 #if defined(__SANITIZE_ADDRESS__) || (defined(__has_feature) && __has_feature(address_sanitizer))
 // 压制系统驱动层与 libdbus-1 / Vulkan ICD 内部单例未释放导致的 LSan 误报
@@ -21,7 +22,9 @@ extern "C" const char* __lsan_default_suppressions() {
     return "leak:libdbus-1\n"
            "leak:libvulkan\n"
            "leak:libnvidia\n"
-           "leak:libGLX\n";
+           "leak:libGLX\n"
+           "leak:libdrm\n"
+           "leak:libVkLayer_\n";
 }
 #endif
 
@@ -320,3 +323,67 @@ TEST_CASE("Device class features, string parsing, memory info, and support queri
     CHECK(hasher(cpu) == hasher(Device::cpu()));
     CHECK(hasher(cpu) != hasher(Device::cuda(0)));
 }
+
+namespace {
+
+template <typename TIn, typename TOut>
+void dummy_unary_kernel(const ::velomind::pConstTensorStorage*, const ::velomind::pTensorStorage*, const void*) {}
+
+template <typename T1, typename T2, typename T3>
+void dummy_binary_kernel(const ::velomind::pConstTensorStorage*, const ::velomind::pTensorStorage*, const void*) {}
+
+// 验证类型注册宏
+VELOMIND_REGISTER_UNARY_OP(::velomind::DeviceType::CPU, ::velomind::Op::NoOp, ::velomind::DataType::Float32, ::velomind::DataType::Float32, dummy_unary_kernel);
+VELOMIND_REGISTER_BINARY_OP(::velomind::DeviceType::CPU, ::velomind::Op::NoOp, ::velomind::DataType::Int32, ::velomind::DataType::Int32, ::velomind::DataType::Int32, dummy_binary_kernel);
+VELOMIND_REGISTER_UNARY_OP(::velomind::DeviceType::CPU, ::velomind::Op::NoOp, ::velomind::DataType::Float16, ::velomind::DataType::Float16, dummy_unary_kernel);
+VELOMIND_REGISTER_BINARY_OP(::velomind::DeviceType::CPU, ::velomind::Op::NoOp, ::velomind::DataType::Float16, ::velomind::DataType::Float16, ::velomind::DataType::Float16, dummy_binary_kernel);
+
+} // namespace
+
+TEST_CASE("Operator kernel registration macros", "[registry][kernel]") {
+    using namespace velomind;
+    using namespace velomind::internal;
+
+    // 验证核心 CPU 算子通过 VELOMIND_REGISTER_BINARY_SAME / VELOMIND_REGISTER_UNARY_SAME 批量注册成功
+    std::array<DataType, 2> bin_f32{DataType::Float32, DataType::Float32};
+    std::array<DataType, 2> bin_i32{DataType::Int32, DataType::Int32};
+    std::array<DataType, 2> bin_i8{DataType::Int8, DataType::Int8};
+    std::array<DataType, 2> bin_bool{DataType::Bool, DataType::Bool};
+
+    CHECK(resolve_op_kernel(Op::Add, bin_f32, DataType::Float32, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Add, bin_i32, DataType::Int32, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Add, bin_i8, DataType::Int8, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Add, bin_bool, DataType::Bool, DeviceType::CPU) != nullptr);
+
+#ifdef VELOMIND_ENABLE_CUDA
+    CHECK(resolve_op_kernel(Op::Add, bin_f32, DataType::Float32, DeviceType::CUDA) != nullptr);
+    CHECK(resolve_op_kernel(Op::Add, bin_i32, DataType::Int32, DeviceType::CUDA) != nullptr);
+#endif
+#ifdef VELOMIND_ENABLE_VULKAN
+    CHECK(resolve_op_kernel(Op::Add, bin_f32, DataType::Float32, DeviceType::VULKAN) != nullptr);
+#endif
+
+    std::array<DataType, 1> un_f32{DataType::Float32};
+    std::array<DataType, 1> un_i32{DataType::Int32};
+    std::array<DataType, 1> un_i8{DataType::Int8};
+    std::array<DataType, 1> un_bool{DataType::Bool};
+
+    CHECK(resolve_op_kernel(Op::Abs, un_f32, DataType::Float32, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Abs, un_i32, DataType::Int32, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Abs, un_i8, DataType::Int8, DeviceType::CPU) != nullptr);
+    CHECK(resolve_op_kernel(Op::Abs, un_bool, DataType::Bool, DeviceType::CPU) != nullptr);
+
+    // 验证显式类型注册宏的 NoOp 内核解析
+    CHECK(resolve_op_kernel(Op::NoOp, un_f32, DataType::Float32, DeviceType::CPU) ==
+          static_cast<Executable::KernelFn>(&dummy_unary_kernel<float, float>));
+    CHECK(resolve_op_kernel(Op::NoOp, bin_i32, DataType::Int32, DeviceType::CPU) ==
+          static_cast<Executable::KernelFn>(&dummy_binary_kernel<std::int32_t, std::int32_t, std::int32_t>));
+
+    std::array<DataType, 1> un_f16{DataType::Float16};
+    std::array<DataType, 2> bin_f16{DataType::Float16, DataType::Float16};
+    CHECK(resolve_op_kernel(Op::NoOp, un_f16, DataType::Float16, DeviceType::CPU) ==
+          static_cast<Executable::KernelFn>(&dummy_unary_kernel<float16_t, float16_t>));
+    CHECK(resolve_op_kernel(Op::NoOp, bin_f16, DataType::Float16, DeviceType::CPU) ==
+          static_cast<Executable::KernelFn>(&dummy_binary_kernel<float16_t, float16_t, float16_t>));
+}
+

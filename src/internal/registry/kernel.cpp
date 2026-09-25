@@ -35,12 +35,4 @@ auto register_op_kernel(DeviceType           device,
     op_kernels(device)[static_cast<std::size_t>(op)].push_back({k, fn});
 }
 
-KernelRegistrar::KernelRegistrar(DeviceType           device,
-                                 Op                   op,
-                                 KernelDtypeKey       k,
-                                 Executable::KernelFn fn)
-{
-    register_op_kernel(device, op, k, fn);
-}
-
 } // namespace velomind::internal

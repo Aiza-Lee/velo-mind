@@ -41,7 +41,7 @@ void softmax_ispc_impl(const TensorStorage* const* in,
     softmax_f32_ispc(x, y, static_cast<int>(cols), static_cast<int>(rows), static_cast<int>(inner));
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Softmax,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Softmax,
                                DataType::Float32, DataType::Float32,
                                softmax_ispc_impl);
 

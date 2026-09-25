@@ -32,7 +32,7 @@ void embedding_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::Embedding,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::Embedding,
                                 DataType::Float32, DataType::Int32,
                                 DataType::Float32, embedding_impl)
 

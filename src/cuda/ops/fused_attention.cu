@@ -206,23 +206,7 @@ void fused_attention_cuda_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::FusedAttention, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_cuda_f32(
-    DeviceType::CUDA, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32, DataType::Float32, DataType::Float32 }, 3, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&fused_attention_cuda_impl<float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_cuda_f16(
-    DeviceType::CUDA, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16, DataType::Float16, DataType::Float16 }, 3, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&fused_attention_cuda_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_fused_attention_cuda_bf16(
-    DeviceType::CUDA, Op::FusedAttention,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16, DataType::BFloat16, DataType::BFloat16 }, 3, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&fused_attention_cuda_impl<bfloat16_t>));
+VELOMIND_REGISTER_TERNARY_SAME_1T_FLOATS(DeviceType::CUDA, Op::FusedAttention, fused_attention_cuda_impl);
 
 } // namespace
 

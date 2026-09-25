@@ -223,60 +223,17 @@ namespace {
     }
 
     // 同精度 cuBLAS 内核
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f32(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_cublas_impl<float, float, float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f16(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float16, DataType::Float16 }, 2, DataType::Float16 },
-        static_cast<Executable::KernelFn>(&matmul_cublas_impl<float16_t, float16_t, float16_t>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f16_f32(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float16, DataType::Float16 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_cublas_impl<float16_t, float16_t, float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_bf16(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::BFloat16, DataType::BFloat16 }, 2, DataType::BFloat16 },
-        static_cast<Executable::KernelFn>(&matmul_cublas_impl<bfloat16_t, bfloat16_t, bfloat16_t>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_bf16_f32(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::BFloat16, DataType::BFloat16 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_cublas_impl<bfloat16_t, bfloat16_t, float>));
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float32,  DataType::Float32,  DataType::Float32,  matmul_cublas_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float16,  DataType::Float16,  DataType::Float16,  matmul_cublas_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float16,  DataType::Float16,  DataType::Float32,  matmul_cublas_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::BFloat16, DataType::BFloat16, DataType::BFloat16, matmul_cublas_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::BFloat16, DataType::BFloat16, DataType::Float32,  matmul_cublas_impl);
 
     // 混合精度自定义内核（FP32 累加）
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f32_f16(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float16 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_mixed_impl<float, float16_t, float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f32_bf16(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::BFloat16 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_mixed_impl<float, bfloat16_t, float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f16_f32_mixed(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float16, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_mixed_impl<float16_t, float, float>));
-
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_bf16_f32_mixed(
-        DeviceType::CUDA, Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::BFloat16, DataType::Float32 }, 2, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&matmul_mixed_impl<bfloat16_t, float, float>));
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float32,  DataType::Float16,  DataType::Float32,  matmul_mixed_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float32,  DataType::BFloat16, DataType::Float32,  matmul_mixed_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::Float16,  DataType::Float32,  DataType::Float32,  matmul_mixed_impl);
+    VELOMIND_REGISTER_BINARY_OP(DeviceType::CUDA, Op::MatMul, DataType::BFloat16, DataType::Float32,  DataType::Float32,  matmul_mixed_impl);
 
 } // namespace
 

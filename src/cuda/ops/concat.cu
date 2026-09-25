@@ -79,29 +79,10 @@ void concat_cuda_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::Concat, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_concat_f32(
-    DeviceType::CUDA, Op::Concat,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32, DataType::Float32 }, 2, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&concat_cuda_impl<float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_concat_f16(
-    DeviceType::CUDA, Op::Concat,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16, DataType::Float16 }, 2, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&concat_cuda_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_concat_bf16(
-    DeviceType::CUDA, Op::Concat,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16, DataType::BFloat16 }, 2, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&concat_cuda_impl<bfloat16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_concat_i32(
-    DeviceType::CUDA, Op::Concat,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Int32, DataType::Int32 }, 2, DataType::Int32 },
-    static_cast<Executable::KernelFn>(&concat_cuda_impl<int32_t>));
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Concat, DataType::Float32,  concat_cuda_impl);
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Concat, DataType::Float16,  concat_cuda_impl);
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Concat, DataType::BFloat16, concat_cuda_impl);
+VELOMIND_REGISTER_BINARY_1T(DeviceType::CUDA, Op::Concat, DataType::Int32,    concat_cuda_impl);
 
 } // namespace
 

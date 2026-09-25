@@ -120,29 +120,8 @@ void slice_cuda_impl(const TensorStorage* const* in,
     check_cuda_kernel(Op::Slice, *out[0]);
 }
 
-static ::velomind::internal::KernelRegistrar _velomind_kr_slice_f32(
-    DeviceType::CUDA, Op::Slice,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float32 }, 1, DataType::Float32 },
-    static_cast<Executable::KernelFn>(&slice_cuda_impl<float>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_slice_f16(
-    DeviceType::CUDA, Op::Slice,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Float16 }, 1, DataType::Float16 },
-    static_cast<Executable::KernelFn>(&slice_cuda_impl<float16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_slice_bf16(
-    DeviceType::CUDA, Op::Slice,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::BFloat16 }, 1, DataType::BFloat16 },
-    static_cast<Executable::KernelFn>(&slice_cuda_impl<bfloat16_t>));
-
-static ::velomind::internal::KernelRegistrar _velomind_kr_slice_i32(
-    DeviceType::CUDA, Op::Slice,
-    ::velomind::internal::KernelDtypeKey{
-        { DataType::Int32 }, 1, DataType::Int32 },
-    static_cast<Executable::KernelFn>(&slice_cuda_impl<std::int32_t>));
+VELOMIND_REGISTER_UNARY_1T_FLOATS(DeviceType::CUDA, Op::Slice, slice_cuda_impl);
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Slice, DataType::Int32, slice_cuda_impl);
 
 } // namespace
 

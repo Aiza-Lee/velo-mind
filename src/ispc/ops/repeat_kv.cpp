@@ -61,7 +61,7 @@ void repeat_kv_ispc_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::ISPC, Op::RepeatKV, repeat_kv_ispc_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::ISPC, Op::RepeatKV, repeat_kv_ispc_impl);
 
 }
 

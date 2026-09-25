@@ -228,15 +228,7 @@ namespace {
         guard.finish(Op::MatMul, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_matmul_f32_vk(
-        DeviceType::VULKAN,
-        Op::MatMul,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 },
-            2,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&matmul_impl));
+VELOMIND_REGISTER_BINARY_FN(DeviceType::VULKAN, Op::MatMul, DataType::Float32, DataType::Float32, DataType::Float32, &matmul_impl);
 
 }
 

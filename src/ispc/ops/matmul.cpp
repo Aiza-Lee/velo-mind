@@ -70,7 +70,7 @@ void matmul_ispc_impl(const TensorStorage* const* in,
                     static_cast<int>(n));
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::ISPC, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::ISPC, Op::MatMul,
                                 DataType::Float32, DataType::Float32,
                                 DataType::Float32, matmul_ispc_impl);
 

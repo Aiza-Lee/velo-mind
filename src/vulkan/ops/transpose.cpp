@@ -226,16 +226,7 @@ namespace {
         guard.finish(Op::Transpose, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar
-        _velomind_kr_transpose_f32_vk(
-            DeviceType::VULKAN,
-            Op::Transpose,
-            ::velomind::internal::KernelDtypeKey{
-                { DataType::Float32 },
-                1,
-                DataType::Float32
-            },
-            static_cast<Executable::KernelFn>(&transpose_impl));
+VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::Transpose, DataType::Float32, DataType::Float32, &transpose_impl);
 
 } // namespace
 

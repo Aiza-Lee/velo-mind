@@ -109,7 +109,7 @@ void slice_ispc_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::ISPC, Op::Slice, slice_ispc_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::ISPC, Op::Slice, slice_ispc_impl);
 
 } // namespace
 

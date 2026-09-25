@@ -25,7 +25,7 @@ void add_impl(const TensorStorage* const* in, TensorStorage* const* out, const v
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::CPU, Op::Add, add_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::CPU, Op::Add, add_impl);
 }
 
 VELOMIND_REGISTER_SIGNATURE(Op::Add, ::velomind::detail::signature_elementwise)

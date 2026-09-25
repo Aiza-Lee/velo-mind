@@ -195,15 +195,7 @@ namespace {
         guard.finish(Op::Embedding, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_embedding_f32_vk(
-        DeviceType::VULKAN,
-        Op::Embedding,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Int32 },
-            2,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&embedding_impl));
+VELOMIND_REGISTER_BINARY_FN(DeviceType::VULKAN, Op::Embedding, DataType::Float32, DataType::Int32, DataType::Float32, &embedding_impl);
 
 }
 

@@ -29,7 +29,7 @@ void abs_ispc_impl(const TensorStorage* const* in,
     abs_f32_ispc(const_cast<float*>(x), y, n);
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Abs,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Abs,
                                DataType::Float32, DataType::Float32,
                                abs_ispc_impl)
 

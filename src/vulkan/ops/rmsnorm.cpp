@@ -209,15 +209,7 @@ namespace {
         guard.finish(Op::RMSNorm, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_rmsnorm_f32_vk(
-        DeviceType::VULKAN,
-        Op::RMSNorm,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32, DataType::Float32 },
-            2,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&rmsnorm_impl));
+VELOMIND_REGISTER_BINARY_FN(DeviceType::VULKAN, Op::RMSNorm, DataType::Float32, DataType::Float32, DataType::Float32, &rmsnorm_impl);
 
 }
 

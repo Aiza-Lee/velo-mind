@@ -61,12 +61,12 @@ void repeat_kv_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::RepeatKV, repeat_kv_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::RepeatKV, repeat_kv_impl);
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::RepeatKV,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::RepeatKV,
                                DataType::Float16, DataType::Float16,
                                repeat_kv_impl);
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::RepeatKV,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::RepeatKV,
                                DataType::BFloat16, DataType::BFloat16,
                                repeat_kv_impl);
 

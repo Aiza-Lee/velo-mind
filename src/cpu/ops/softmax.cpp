@@ -47,12 +47,12 @@ void softmax_impl(const TensorStorage* const* in, TensorStorage* const* out, con
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Softmax, softmax_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Softmax, softmax_impl);
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Softmax,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Softmax,
                                DataType::Float16, DataType::Float16,
                                softmax_impl);
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Softmax,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Softmax,
                                DataType::BFloat16, DataType::BFloat16,
                                softmax_impl);
 

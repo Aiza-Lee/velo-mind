@@ -40,18 +40,14 @@ void rotary_embedding_ispc_impl(const TensorStorage* const* in,
                               static_cast<int>(outer));
 }
 
-static ::velomind::internal::KernelRegistrar
-    _velomind_kr_rotary_embedding_ispc(
-        ::velomind::DeviceType::ISPC,
-        ::velomind::Op::RotaryEmbedding,
-        ::velomind::internal::KernelDtypeKey{
-            { ::velomind::DataType::Float32,
-              ::velomind::DataType::Float32,
-              ::velomind::DataType::Float32 },
-            3,
-            ::velomind::DataType::Float32
-        },
-        &rotary_embedding_ispc_impl<float, float, float>);
+VELOMIND_REGISTER_TERNARY_OP(
+    ::velomind::DeviceType::ISPC,
+    ::velomind::Op::RotaryEmbedding,
+    ::velomind::DataType::Float32,
+    ::velomind::DataType::Float32,
+    ::velomind::DataType::Float32,
+    ::velomind::DataType::Float32,
+    rotary_embedding_ispc_impl);
 
 }
 

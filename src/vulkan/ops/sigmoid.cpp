@@ -187,15 +187,7 @@ namespace {
         guard.finish(Op::Sigmoid, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_sigmoid_f32_vk(
-        DeviceType::VULKAN,
-        Op::Sigmoid,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 },
-            1,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&sigmoid_impl));
+VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::Sigmoid, DataType::Float32, DataType::Float32, &sigmoid_impl);
 
 }
 

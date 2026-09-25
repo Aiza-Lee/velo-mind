@@ -195,15 +195,7 @@ namespace {
         guard.finish(Op::Softmax, *out[0]);
     }
 
-    static ::velomind::internal::KernelRegistrar _velomind_kr_softmax_f32_vk(
-        DeviceType::VULKAN,
-        Op::Softmax,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 },
-            1,
-            DataType::Float32
-        },
-        static_cast<Executable::KernelFn>(&softmax_impl));
+VELOMIND_REGISTER_UNARY_FN(DeviceType::VULKAN, Op::Softmax, DataType::Float32, DataType::Float32, &softmax_impl);
 
 }
 

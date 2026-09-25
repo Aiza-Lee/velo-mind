@@ -32,12 +32,12 @@ void reshape_impl(const TensorStorage* const* in,
     std::memcpy(y, x, n_in * sizeof(T2));
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Reshape, reshape_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Reshape, reshape_impl);
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Reshape,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Reshape,
                                DataType::Float16, DataType::Float16,
                                reshape_impl);
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::CPU, Op::Reshape,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::CPU, Op::Reshape,
                                DataType::BFloat16, DataType::BFloat16,
                                reshape_impl);
 

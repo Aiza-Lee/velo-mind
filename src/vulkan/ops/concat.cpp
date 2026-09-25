@@ -74,7 +74,7 @@ void concat_impl(const TensorStorage* const* in,
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::VULKAN, Op::Concat, concat_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::VULKAN, Op::Concat, concat_impl);
 
 } // namespace
 

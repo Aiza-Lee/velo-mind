@@ -3,3 +3,6 @@ leak:libdbus-1
 leak:libvulkan
 leak:libnvidia
 leak:libGLX
+leak:libdrm
+leak:libVkLayer_
+

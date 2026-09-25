@@ -25,7 +25,7 @@ void relu_impl(const TensorStorage* const* in, TensorStorage* const* out, const 
     }
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL_SAME(DeviceType::CPU, Op::Relu, relu_impl);
+VELOMIND_REGISTER_UNARY_SAME(DeviceType::CPU, Op::Relu, relu_impl);
 
 }
 

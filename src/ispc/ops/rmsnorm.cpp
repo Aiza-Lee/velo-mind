@@ -53,7 +53,7 @@ void rmsnorm_ispc_impl(const TensorStorage* const* in,
                      static_cast<int>(total_rows));
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::ISPC, Op::RMSNorm,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::ISPC, Op::RMSNorm,
                                 DataType::Float32, DataType::Float32,
                                 DataType::Float32, rmsnorm_ispc_impl)
 

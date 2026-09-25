@@ -609,25 +609,25 @@ void matmul_impl(const TensorStorage* const* in, TensorStorage* const* out, cons
     }
 }
 
-VELOMIND_REGISTER_BINARY_KERNEL_SAME(DeviceType::CPU, Op::MatMul, matmul_impl);
+VELOMIND_REGISTER_BINARY_SAME(DeviceType::CPU, Op::MatMul, matmul_impl);
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::Float16, DataType::Float16, DataType::Float16,
                                 matmul_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::Float16, DataType::Float16, DataType::Float32,
                                 matmul_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::Float32, DataType::Float16, DataType::Float32,
                                 matmul_impl);
 
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::BFloat16, DataType::BFloat16, DataType::BFloat16,
                                 matmul_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::BFloat16, DataType::BFloat16, DataType::Float32,
                                 matmul_impl);
-VELOMIND_REGISTER_BINARY_KERNEL(DeviceType::CPU, Op::MatMul,
+VELOMIND_REGISTER_BINARY_OP(DeviceType::CPU, Op::MatMul,
                                 DataType::Float32, DataType::BFloat16, DataType::Float32,
                                 matmul_impl);
 

@@ -31,11 +31,7 @@ void tanh_impl(const TensorStorage* const* in, TensorStorage* const* out, const 
 }
 
 namespace {
-    static ::velomind::internal::KernelRegistrar _velomind_kr_tanh_f32(
-        DeviceType::CUDA, Op::Tanh,
-        ::velomind::internal::KernelDtypeKey{
-            { DataType::Float32 }, 1, DataType::Float32 },
-        static_cast<Executable::KernelFn>(&tanh_impl<float>));
+VELOMIND_REGISTER_UNARY_1T(DeviceType::CUDA, Op::Tanh, DataType::Float32, tanh_impl);
 }
 
 }

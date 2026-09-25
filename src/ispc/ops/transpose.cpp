@@ -65,7 +65,7 @@ void transpose_ispc_impl(const TensorStorage* const* in,
                        static_cast<int>(total));
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Transpose,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Transpose,
                                DataType::Float32, DataType::Float32,
                                transpose_ispc_impl);
 

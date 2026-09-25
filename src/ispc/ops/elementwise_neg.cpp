@@ -29,7 +29,7 @@ void neg_ispc_impl(const TensorStorage* const* in,
     neg_f32_ispc(const_cast<float*>(x), y, n);
 }
 
-VELOMIND_REGISTER_UNARY_KERNEL(DeviceType::ISPC, Op::Neg,
+VELOMIND_REGISTER_UNARY_OP(DeviceType::ISPC, Op::Neg,
                                DataType::Float32, DataType::Float32,
                                neg_ispc_impl)
 
