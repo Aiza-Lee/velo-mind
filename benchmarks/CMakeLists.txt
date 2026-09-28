@@ -1,5 +1,7 @@
 add_executable(benchmark_baseline
     benchmark_baseline.cpp
+    benchmark_reporter.cpp
+    benchmark_runner.cpp
 )
 
 target_link_libraries(benchmark_baseline PRIVATE

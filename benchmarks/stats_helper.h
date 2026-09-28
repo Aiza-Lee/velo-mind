@@ -47,6 +47,7 @@ struct ErrorStats {
     std::size_t nan_count      = 0;
     std::size_t inf_count      = 0;
     bool        all_finite     = true;
+    bool        has_reference  = false;
 };
 
 inline auto check_finite(const std::vector<float>& data) -> std::pair<std::size_t, std::size_t> {
@@ -67,7 +68,11 @@ inline auto compute_error_stats(const std::vector<float>& actual,
     err.inf_count = inf_c;
     err.all_finite = (nan_c == 0 && inf_c == 0);
 
-    if (actual.empty() || ref.empty()) return err;
+    if (actual.empty() || ref.empty()) {
+        err.has_reference = false;
+        return err;
+    }
+    err.has_reference = true;
 
     const std::size_t n = std::min(actual.size(), ref.size());
     double sum_sq = 0.0;
