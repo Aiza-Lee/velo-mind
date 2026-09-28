@@ -30,8 +30,8 @@ __global__ void embedding_f32_i32_kernel(const float* __restrict__ table,
 }
 
 template <typename TTable, typename TIdx, typename TOut>
-void embedding_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void embedding_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                 ) {
     const auto* table = static_cast<const TTable*>(in[0]->data);
     const auto* idx   = static_cast<const TIdx*>(in[1]->data);

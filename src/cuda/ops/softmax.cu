@@ -51,7 +51,7 @@ __global__ void softmax_kernel(const T* x, T* y, std::size_t rows, std::size_t c
 }
 
 template <typename T>
-void softmax_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* attrs) {
+void softmax_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* attrs) {
     const T* x = static_cast<const T*>(in[0]->data);
     T*       y = static_cast<T*>(out[0]->data);
 

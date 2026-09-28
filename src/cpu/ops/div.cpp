@@ -14,7 +14,7 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2, typename T3>
-void div_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+void div_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
     const T1* a = static_cast<const T1*>(in[0]->data);
     const T2* b = static_cast<const T2*>(in[1]->data);
     T3*       c = static_cast<T3*>(out[0]->data);

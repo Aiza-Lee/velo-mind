@@ -43,8 +43,8 @@ __global__ void rotary_embedding_f32_kernel(const float* __restrict__ x,
 }
 
 template <typename TIn, typename TCos, typename TSin>
-void rotary_embedding_impl(const TensorStorage* const* in,
-                           TensorStorage* const*      out,
+void rotary_embedding_impl(const pConstTensorStorage* in,
+                           const pTensorStorage*      out,
                            const void*                 ) {
     const auto* x   = static_cast<const TIn*>(in[0]->data);
     const auto* cos = static_cast<const TCos*>(in[1]->data);

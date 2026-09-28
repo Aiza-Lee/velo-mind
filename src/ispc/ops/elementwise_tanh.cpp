@@ -17,8 +17,8 @@ namespace {
 extern "C" void tanh_f32_ispc(float* x, float* y, int n);
 
 template <typename T1, typename T2>
-void tanh_ispc_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void tanh_ispc_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                 ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float>,
                   "ISPC Tanh only supports float32");

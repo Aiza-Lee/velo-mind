@@ -41,8 +41,8 @@ __global__ void concat_kernel(const T* a, const T* b, T* out,
 }
 
 template <typename T>
-void concat_cuda_impl(const TensorStorage* const* in,
-                      TensorStorage* const*      out,
+void concat_cuda_impl(const pConstTensorStorage* in,
+                      const pTensorStorage*      out,
                       const void*                 attrs_ptr) {
     const auto& desc  = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& cattr = std::get<ConcatAttrs>(desc.attrs);

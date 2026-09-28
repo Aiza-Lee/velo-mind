@@ -111,7 +111,7 @@ namespace {
         return reinterpret_cast<const VulkanExt*>(s + 1)->buffer;
     }
 
-    void embedding_impl(const TensorStorage* const* in, TensorStorage* const* out,
+    void embedding_impl(const pConstTensorStorage* in, const pTensorStorage* out,
                         const void* ) {
         auto& state = backend_vulkan::vulkan_state();
         auto& pipe  = embedding_pipeline();

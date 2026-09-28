@@ -41,8 +41,8 @@ __global__ void transpose_kernel(const T* __restrict__ x,
 }
 
 template <typename T>
-void transpose_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void transpose_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                 attrs_ptr) {
     const auto* x = static_cast<const T*>(in[0]->data);
     auto*       y = static_cast<T*>(out[0]->data);

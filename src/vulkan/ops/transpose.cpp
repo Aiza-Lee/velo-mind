@@ -110,8 +110,8 @@ namespace {
         return p;
     }
 
-    void transpose_impl(const TensorStorage* const* in,
-                        TensorStorage* const*      out,
+    void transpose_impl(const pConstTensorStorage* in,
+                        const pTensorStorage*      out,
                         const void*                 attrs_ptr) {
         auto& state = backend_vulkan::vulkan_state();
         auto& pipe  = transpose_pipeline();

@@ -22,8 +22,8 @@ extern "C" void rmsnorm_f32_ispc(const float* x,
                                  int          total_rows);
 
 template <typename T1, typename T2, typename T3>
-void rmsnorm_ispc_impl(const TensorStorage* const* in,
-                       TensorStorage* const*      out,
+void rmsnorm_ispc_impl(const pConstTensorStorage* in,
+                       const pTensorStorage*      out,
                        const void*                attrs_ptr) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float> && std::is_same_v<T3, float>,
                   "ISPC RMSNorm currently supports Float32");

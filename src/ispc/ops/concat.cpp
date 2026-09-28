@@ -17,8 +17,8 @@ namespace velomind::backend::ispc {
 namespace {
 
 template <typename T1, typename T2, typename T3>
-void concat_ispc_impl(const TensorStorage* const* in,
-                      TensorStorage* const*      out,
+void concat_ispc_impl(const pConstTensorStorage* in,
+                      const pTensorStorage*      out,
                       const void*                 attrs_ptr) {
     static_assert(std::is_same_v<T1, T2> && std::is_same_v<T1, T3>,
                   "Concat: in1/in2/out dtype must match (v1 uniform-precision)");

@@ -17,8 +17,8 @@ namespace {
 extern "C" void abs_f32_ispc(float* x, float* y, int n);
 
 template <typename T1, typename T2>
-void abs_ispc_impl(const TensorStorage* const* in,
-                   TensorStorage* const*      out,
+void abs_ispc_impl(const pConstTensorStorage* in,
+                   const pTensorStorage*      out,
                    const void*                 ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float>,
                   "ISPC Abs only supports float32");

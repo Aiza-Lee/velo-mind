@@ -23,8 +23,8 @@ extern "C" void transpose_f32_ispc(const float* x,
                                    int          total);
 
 template <typename T1, typename T2>
-void transpose_ispc_impl(const TensorStorage* const* in,
-                         TensorStorage* const*      out,
+void transpose_ispc_impl(const pConstTensorStorage* in,
+                         const pTensorStorage*      out,
                          const void*                attrs_ptr) {
     const auto& desc  = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& tattr = std::get<TransposeAttrs>(desc.attrs);

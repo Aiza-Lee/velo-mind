@@ -22,8 +22,8 @@ extern "C" void rotary_embedding_f32_ispc(const float* x,
                                           int          total_rows);
 
 template <typename TIn, typename TCos, typename TSin>
-void rotary_embedding_ispc_impl(const TensorStorage* const* in,
-                                TensorStorage* const*      out,
+void rotary_embedding_ispc_impl(const pConstTensorStorage* in,
+                                const pTensorStorage*      out,
                                 const void* ) {
     const auto* x   = static_cast<const float*>(in[0]->data);
     const auto* cos = static_cast<const float*>(in[1]->data);

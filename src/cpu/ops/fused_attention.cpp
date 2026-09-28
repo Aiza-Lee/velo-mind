@@ -20,8 +20,8 @@ namespace {
 
 // 基于在线 Softmax 流式计算单头/多头注意力输出，消除中间 [H, S_q, S_k] 分数矩阵与权重的全量显存分配。
 template <typename T>
-void fused_attention_impl(const TensorStorage* const* in,
-                          TensorStorage* const*      out,
+void fused_attention_impl(const pConstTensorStorage* in,
+                          const pTensorStorage*      out,
                           const void*                attrs_ptr) {
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& attr = std::get<FusedAttentionAttrs>(desc.attrs);

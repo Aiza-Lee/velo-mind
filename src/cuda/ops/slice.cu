@@ -43,8 +43,8 @@ __global__ void slice_kernel(const T* __restrict__ x, T* __restrict__ y,
 }
 
 template <typename T>
-void slice_cuda_impl(const TensorStorage* const* in,
-                     TensorStorage* const*      out,
+void slice_cuda_impl(const pConstTensorStorage* in,
+                     const pTensorStorage*      out,
                      const void*                attrs_ptr) {
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& attr = std::get<SliceAttrs>(desc.attrs);

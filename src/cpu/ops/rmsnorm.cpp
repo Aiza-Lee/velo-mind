@@ -15,9 +15,9 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2, typename T3>
-void rmsnorm_impl(const TensorStorage* const* in,
-                  TensorStorage* const*      out,
-                  const void*                 attrs_ptr) {
+void rmsnorm_impl(const pConstTensorStorage* in,
+                  const pTensorStorage*      out,
+                  const void*                attrs_ptr) {
 
     const auto& desc  = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& attrs = std::get<RMSNormAttrs>(desc.attrs);

@@ -17,8 +17,8 @@ namespace velomind::backend::vulkan {
 namespace {
 
 // Vulkan 后端头复制内核：主机可见缓冲区上的连续块内存复制。
-void repeat_kv_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void repeat_kv_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                attrs_ptr) {
     backend_vulkan::sync_vulkan_batch_if_pending();
 

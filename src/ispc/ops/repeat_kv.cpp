@@ -18,8 +18,8 @@ namespace {
 
 // ISPC 共享内存后端的 GQA 分组重复内核；基于连续内维块复制。
 template <typename T1, typename T2>
-void repeat_kv_ispc_impl(const TensorStorage* const* in,
-                         TensorStorage* const*      out,
+void repeat_kv_ispc_impl(const pConstTensorStorage* in,
+                         const pTensorStorage*      out,
                          const void*                attrs_ptr) {
     static_assert(std::is_same_v<T1, T2>, "RepeatKV: in/out dtype must match");
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);

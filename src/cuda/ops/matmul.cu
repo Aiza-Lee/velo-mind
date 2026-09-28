@@ -35,7 +35,7 @@ namespace {
     template <> struct CublasType<bfloat16_t> { static constexpr cudaDataType_t value = CUDA_R_16BF; };
 
     template <typename T1, typename T2, typename T3>
-    void matmul_cublas_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+    void matmul_cublas_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
         const T1* a_data = static_cast<const T1*>(in[0]->data);
         const T2* b_data = static_cast<const T2*>(in[1]->data);
         T3*       c_data = static_cast<T3*>(out[0]->data);
@@ -171,7 +171,7 @@ namespace {
     }
 
     template <typename T1, typename T2, typename T3>
-    void matmul_mixed_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+    void matmul_mixed_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
         const T1* a_data = static_cast<const T1*>(in[0]->data);
         const T2* b_data = static_cast<const T2*>(in[1]->data);
         T3*       c_data = static_cast<T3*>(out[0]->data);

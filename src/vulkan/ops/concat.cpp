@@ -19,8 +19,8 @@ namespace {
 
 // Vulkan 后端拼接内核：同步待决批量指令后在主机可见缓冲区上执行连续分块内存拷贝。
 template <typename T1, typename T2, typename T3>
-void concat_impl(const TensorStorage* const* in,
-                 TensorStorage* const*      out,
+void concat_impl(const pConstTensorStorage* in,
+                 const pTensorStorage*      out,
                  const void*                attrs_ptr) {
     backend_vulkan::sync_vulkan_batch_if_pending();
 

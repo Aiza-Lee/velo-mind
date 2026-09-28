@@ -18,8 +18,8 @@ namespace {
 
 // 沿指定轴以连续块复制方式扩展分组头，主要支撑 GQA 中 KV 头的广播对齐。
 template <typename T1, typename T2>
-void repeat_kv_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void repeat_kv_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                attrs_ptr) {
     static_assert(std::is_same_v<T1, T2>, "RepeatKV: in/out dtype must match");
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);

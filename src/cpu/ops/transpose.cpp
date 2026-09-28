@@ -15,8 +15,8 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2>
-void transpose_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void transpose_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void*                 attrs_ptr) {
     const auto& desc  = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& tattr = std::get<TransposeAttrs>(desc.attrs);

@@ -56,8 +56,8 @@ __global__ void rmsnorm_kernel(const T1* __restrict__ x,
 }
 
 template <typename T1, typename T2, typename T3>
-void rmsnorm_impl(const TensorStorage* const* in,
-                  TensorStorage* const*      out,
+void rmsnorm_impl(const pConstTensorStorage* in,
+                  const pTensorStorage*      out,
                   const void*                 attrs_ptr) {
     float eps = 1e-5f;
     if (attrs_ptr != nullptr) {

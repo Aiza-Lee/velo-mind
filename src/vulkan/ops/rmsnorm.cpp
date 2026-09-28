@@ -112,7 +112,7 @@ namespace {
         return reinterpret_cast<const VulkanExt*>(s + 1)->buffer;
     }
 
-    void rmsnorm_impl(const TensorStorage* const* in, TensorStorage* const* out,
+    void rmsnorm_impl(const pConstTensorStorage* in, const pTensorStorage* out,
                       const void* attrs_ptr) {
         auto& state = backend_vulkan::vulkan_state();
         auto& pipe  = rmsnorm_pipeline();

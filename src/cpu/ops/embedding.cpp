@@ -14,8 +14,8 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename TTable, typename TIdx, typename TOut>
-void embedding_impl(const TensorStorage* const* in,
-                    TensorStorage* const*      out,
+void embedding_impl(const pConstTensorStorage* in,
+                    const pTensorStorage*      out,
                     const void* ) {
     const TTable* table = static_cast<const TTable*>(in[0]->data);
     const TIdx*   idx   = static_cast<const TIdx*>(in[1]->data);

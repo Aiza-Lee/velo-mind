@@ -17,8 +17,8 @@ namespace {
 extern "C" void rsqrt_f32_ispc(const float* x, float* y, int n);
 
 template <typename T1, typename T2>
-void rsqrt_ispc_impl(const TensorStorage* const* in,
-                     TensorStorage* const*      out,
+void rsqrt_ispc_impl(const pConstTensorStorage* in,
+                     const pTensorStorage*      out,
                      const void* ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float>,
                   "ISPC Rsqrt currently supports Float32");

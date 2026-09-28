@@ -109,7 +109,7 @@ namespace {
         return reinterpret_cast<const VulkanExt*>(s + 1)->buffer;
     }
 
-    void softmax_impl(const TensorStorage* const* in, TensorStorage* const* out,
+    void softmax_impl(const pConstTensorStorage* in, const pTensorStorage* out,
                       const void* attrs) {
         auto& state = backend_vulkan::vulkan_state();
         auto& pipe  = softmax_pipeline();

@@ -22,8 +22,8 @@ extern "C" void softmax_f32_ispc(const float* x,
                                  int          inner);
 
 template <typename T1, typename T2>
-void softmax_ispc_impl(const TensorStorage* const* in,
-                       TensorStorage* const*      out,
+void softmax_ispc_impl(const pConstTensorStorage* in,
+                       const pTensorStorage*      out,
                        const void* attrs) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float>,
                   "ISPC Softmax currently supports Float32");

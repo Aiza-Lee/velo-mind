@@ -15,8 +15,8 @@ namespace velomind::backend::cuda {
 namespace {
 
 template <typename T>
-void reshape_impl(const TensorStorage* const* in,
-                  TensorStorage* const*      out,
+void reshape_impl(const pConstTensorStorage* in,
+                  const pTensorStorage*      out,
                   const void*                 ) {
     const auto* x = static_cast<const T*>(in[0]->data);
     auto*       y = static_cast<T*>(out[0]->data);

@@ -17,8 +17,8 @@ namespace {
 extern "C" void add_f32_ispc(float* a, float* b, float* c, int n);
 
 template <typename T1, typename T2, typename T3>
-void add_ispc_impl(const TensorStorage* const* in,
-                   TensorStorage* const*      out,
+void add_ispc_impl(const pConstTensorStorage* in,
+                   const pTensorStorage*      out,
                    const void*                 ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float> && std::is_same_v<T3, float>,
                   "ISPC Add only supports float32 — extend ispc sources for other dtypes");

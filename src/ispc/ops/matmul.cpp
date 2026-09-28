@@ -24,8 +24,8 @@ extern "C" void matmul_f32_ispc(const float* a,
                                 int          n);
 
 template <typename T1, typename T2, typename T3>
-void matmul_ispc_impl(const TensorStorage* const* in,
-                      TensorStorage* const*      out,
+void matmul_ispc_impl(const pConstTensorStorage* in,
+                      const pTensorStorage*      out,
                       const void* ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float> && std::is_same_v<T3, float>,
                   "ISPC MatMul currently supports Float32");

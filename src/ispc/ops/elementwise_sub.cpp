@@ -17,8 +17,8 @@ namespace {
 extern "C" void sub_f32_ispc(float* a, float* b, float* c, int n);
 
 template <typename T1, typename T2, typename T3>
-void sub_ispc_impl(const TensorStorage* const* in,
-                   TensorStorage* const*      out,
+void sub_ispc_impl(const pConstTensorStorage* in,
+                   const pTensorStorage*      out,
                    const void*                 ) {
     static_assert(std::is_same_v<T1, float> && std::is_same_v<T2, float> && std::is_same_v<T3, float>,
                   "ISPC Sub only supports float32");

@@ -109,7 +109,7 @@ namespace {
         return reinterpret_cast<const VulkanExt*>(s + 1)->buffer;
     }
 
-    void sigmoid_impl(const TensorStorage* const* in, TensorStorage* const* out,
+    void sigmoid_impl(const pConstTensorStorage* in, const pTensorStorage* out,
                       const void* ) {
         auto& state = backend_vulkan::vulkan_state();
         auto& pipe  = sigmoid_pipeline();

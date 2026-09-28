@@ -14,8 +14,8 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename TIn, typename TCos, typename TSin>
-void rotary_embedding_impl(const TensorStorage* const* in,
-                           TensorStorage* const*      out,
+void rotary_embedding_impl(const pConstTensorStorage* in,
+                           const pTensorStorage*      out,
                            const void*                 ) {
     const TIn*  x   = static_cast<const TIn*>(in[0]->data);
     const TCos* cos = static_cast<const TCos*>(in[1]->data);

@@ -19,8 +19,8 @@ namespace {
 
 // ISPC 共享内存后端的切片内核：优先识别连续内维或首轴切片以加速，一般情况逐块复制。
 template <typename T1, typename T2>
-void slice_ispc_impl(const TensorStorage* const* in,
-                     TensorStorage* const*      out,
+void slice_ispc_impl(const pConstTensorStorage* in,
+                     const pTensorStorage*      out,
                      const void*                attrs_ptr) {
     static_assert(std::is_same_v<T1, T2>, "Slice: in/out dtype must match");
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);

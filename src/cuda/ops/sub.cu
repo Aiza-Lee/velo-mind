@@ -17,7 +17,7 @@ __global__ void sub_kernel(const T* a, const T* b, T* c, std::size_t n) {
 }
 
 template <typename T>
-void sub_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+void sub_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
     const T* a = static_cast<const T*>(in[0]->data);
     const T* b = static_cast<const T*>(in[1]->data);
     T*       c = static_cast<T*>(out[0]->data);

@@ -17,7 +17,7 @@ __global__ void sigmoid_kernel(const T* x, T* y, std::size_t n) {
 }
 
 template <typename T>
-void sigmoid_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+void sigmoid_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
     const T* x = static_cast<const T*>(in[0]->data);
     T*       y = static_cast<T*>(out[0]->data);
     auto      n = storage_numel(*out[0]);

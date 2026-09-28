@@ -19,8 +19,8 @@ namespace velomind::backend::vulkan {
 namespace {
 
 // Vulkan 后端切片内核：在主机可见缓冲区上执行切片复制。
-void slice_impl(const TensorStorage* const* in,
-                TensorStorage* const*      out,
+void slice_impl(const pConstTensorStorage* in,
+                const pTensorStorage*      out,
                 const void*                attrs_ptr) {
     backend_vulkan::sync_vulkan_batch_if_pending();
 

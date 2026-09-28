@@ -15,7 +15,7 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2>
-void tanh_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* ) {
+void tanh_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* ) {
     const T1* x = static_cast<const T1*>(in[0]->data);
     T2*       y = static_cast<T2*>(out[0]->data);
     auto      n = storage_numel(*out[0]);

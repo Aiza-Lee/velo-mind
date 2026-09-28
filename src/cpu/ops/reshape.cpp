@@ -16,8 +16,8 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2>
-void reshape_impl(const TensorStorage* const* in,
-                  TensorStorage* const*      out,
+void reshape_impl(const pConstTensorStorage* in,
+                  const pTensorStorage*      out,
                   const void*                 ) {
     static_assert(std::is_same_v<T1, T2>,
                   "Reshape in/out dtypes must match (v1 uniform-precision)");

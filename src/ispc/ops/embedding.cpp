@@ -20,8 +20,8 @@ extern "C" void embedding_f32_i32_ispc(const float* table,
                                        int          total_tokens);
 
 template <typename TTable, typename TIdx, typename TOut>
-void embedding_ispc_impl(const TensorStorage* const* in,
-                         TensorStorage* const*      out,
+void embedding_ispc_impl(const pConstTensorStorage* in,
+                         const pTensorStorage*      out,
                          const void* ) {
     const auto* table = static_cast<const float*>(in[0]->data);
     const auto* idx   = static_cast<const int*>(in[1]->data);

@@ -16,8 +16,8 @@ namespace velomind::backend::vulkan {
 
 namespace {
 
-    void reshape_impl(const TensorStorage* const* in,
-                      TensorStorage* const*      out,
+    void reshape_impl(const pConstTensorStorage* in,
+                      const pTensorStorage*      out,
                       const void*                 ) {
         backend_vulkan::sync_vulkan_batch_if_pending();
 

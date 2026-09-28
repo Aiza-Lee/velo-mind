@@ -24,8 +24,8 @@ __global__ void rsqrt_f32_kernel(const float* __restrict__ x,
 }
 
 template <typename T>
-void rsqrt_impl(const TensorStorage* const* in,
-                TensorStorage* const*      out,
+void rsqrt_impl(const pConstTensorStorage* in,
+                const pTensorStorage*      out,
                 const void*                 ) {
     const auto* x = static_cast<const T*>(in[0]->data);
     auto*       y = static_cast<T*>(out[0]->data);

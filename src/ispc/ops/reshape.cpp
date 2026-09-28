@@ -17,8 +17,8 @@ namespace velomind::backend::ispc {
 namespace {
 
 template <typename T1, typename T2>
-void reshape_ispc_impl(const TensorStorage* const* in,
-                       TensorStorage* const*      out,
+void reshape_ispc_impl(const pConstTensorStorage* in,
+                       const pTensorStorage*      out,
                        const void* ) {
     static_assert(std::is_same_v<T1, T2>,
                   "Reshape in/out dtypes must match");

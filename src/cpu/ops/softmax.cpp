@@ -16,7 +16,7 @@ namespace velomind::backend::cpu {
 namespace {
 
 template <typename T1, typename T2>
-void softmax_impl(const TensorStorage* const* in, TensorStorage* const* out, const void* attrs) {
+void softmax_impl(const pConstTensorStorage* in, const pTensorStorage* out, const void* attrs) {
     const T1* x = static_cast<const T1*>(in[0]->data);
     T2*       y = static_cast<T2*>(out[0]->data);
 

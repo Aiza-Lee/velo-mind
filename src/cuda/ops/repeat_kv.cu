@@ -38,8 +38,8 @@ __global__ void repeat_kv_kernel(const T* __restrict__ x, T* __restrict__ y,
 }
 
 template <typename T>
-void repeat_kv_cuda_impl(const TensorStorage* const* in,
-                         TensorStorage* const*      out,
+void repeat_kv_cuda_impl(const pConstTensorStorage* in,
+                         const pTensorStorage*      out,
                          const void*                attrs_ptr) {
     const auto& desc = *static_cast<const OpDescriptor*>(attrs_ptr);
     const auto& attr = std::get<RepeatKVAttrs>(desc.attrs);
