@@ -14,10 +14,8 @@
 namespace velomind::examples::smollm2 {
 
 struct EngineConfig {
-    std::string model_path =
-        "/home/aiza/workspace/assets/ai-models/SmolLM2-135M/model.safetensors";
-    std::string tokenizer_path =
-        "/home/aiza/workspace/assets/ai-models/SmolLM2-135M/tokenizer.json";
+    std::string model_path;
+    std::string tokenizer_path;
 #ifdef VELOMIND_ENABLE_ISPC
     velomind::DeviceType device = velomind::DeviceType::ISPC;
 #else

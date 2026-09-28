@@ -4,6 +4,7 @@
 #include <string>
 
 #include "benchmark_runner.h"
+#include "llama_model_finder.h"
 
 int main(int argc, char** argv) {
     using namespace velomind;
@@ -61,6 +62,18 @@ int main(int argc, char** argv) {
                 argv[0]
             );
             return 0;
+        }
+    }
+
+    if (!cfg.use_synthetic && (cfg.model_path.empty() || cfg.tokenizer_path.empty())) {
+        auto assets = velomind::examples::llama::resolve_model_assets(
+            velomind::examples::llama::ModelFamily::SmolLM2,
+            cfg.model_path,
+            cfg.tokenizer_path
+        );
+        if (assets.found) {
+            cfg.model_path = assets.model_path.string();
+            cfg.tokenizer_path = assets.tokenizer_path.string();
         }
     }
 

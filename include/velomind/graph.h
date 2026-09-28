@@ -19,6 +19,10 @@ namespace velomind {
 
 class Executable;
 
+namespace internal {
+class GraphCompiler;
+}
+
 template <typename T>
 concept TensorHandle = std::is_same_v<std::remove_cvref_t<T>, Tensor>;
 
@@ -120,6 +124,7 @@ private:
     auto _topological_order()  const -> std::vector<pConstNode>;
 
     friend struct GraphTestAccess;
+    friend class internal::GraphCompiler;
 
     std::vector<std::shared_ptr<TensorStorage>> _tensors;
     std::vector<Node>                           _nodes;

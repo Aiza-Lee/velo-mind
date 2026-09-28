@@ -13,10 +13,8 @@
 namespace velomind::examples::tinyllama {
 
 struct EngineConfig {
-    std::string model_path =
-        "/home/aiza/workspace/assets/ai-models/TinyLlama_v1.1/model.safetensors";
-    std::string tokenizer_path =
-        "/home/aiza/workspace/assets/ai-models/TinyLlama_v1.1/tokenizer.model";
+    std::string model_path;
+    std::string tokenizer_path;
 #ifdef VELOMIND_ENABLE_ISPC
     velomind::DeviceType device = velomind::DeviceType::ISPC;
 #else

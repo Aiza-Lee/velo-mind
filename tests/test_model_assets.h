@@ -19,37 +19,6 @@ inline auto is_model_pipeline_required() -> bool {
     return s == "1" || s == "true" || s == "TRUE" || s == "ON" || s == "on";
 }
 
-// 获取模型资产根目录（优先使用环境变量 VELOMIND_MODEL_DIR）
-inline auto get_model_assets_root() -> std::filesystem::path {
-    if (const char* env = std::getenv("VELOMIND_MODEL_DIR")) {
-        return std::filesystem::path(env);
-    }
-    return std::filesystem::path("/home/aiza/workspace/assets/ai-models");
-}
-
-// 获取 TinyLlama 模型 safetensors 文件路径（支持环境变量 VELOMIND_TINYLLAMA_PATH / VELOMIND_TINYLLAMA_DIR）
-inline auto get_tinyllama_model_path() -> std::filesystem::path {
-    if (const char* env = std::getenv("VELOMIND_TINYLLAMA_PATH")) {
-        return std::filesystem::path(env);
-    }
-    if (const char* env = std::getenv("VELOMIND_TINYLLAMA_DIR")) {
-        return std::filesystem::path(env) / "model.safetensors";
-    }
-    return get_model_assets_root() / "TinyLlama_v1.1" / "model.safetensors";
-}
-
-// 获取 SmolLM2 模型目录（支持环境变量 VELOMIND_SMOLLM2_DIR / VELOMIND_SMOLLM2_PATH）
-inline auto get_smollm2_model_dir() -> std::filesystem::path {
-    if (const char* env = std::getenv("VELOMIND_SMOLLM2_DIR")) {
-        return std::filesystem::path(env);
-    }
-    if (const char* env = std::getenv("VELOMIND_SMOLLM2_PATH")) {
-        auto p = std::filesystem::path(env);
-        return std::filesystem::is_directory(p) ? p : p.parent_path();
-    }
-    return get_model_assets_root() / "SmolLM2-135M";
-}
-
 #ifndef VELOMIND_PROJECT_ROOT
 #define VELOMIND_PROJECT_ROOT ""
 #endif
@@ -76,6 +45,81 @@ inline auto resolve_repo_path(const std::filesystem::path& rel_path) -> std::fil
         prefix /= "..";
     }
     return rel_path;
+}
+
+// 获取模型资产根目录（多级级联：环境变量 > 仓库 models/ > 用户缓存 ~/.cache/velomind/models > 系统兼容目录）
+inline auto get_model_assets_root() -> std::filesystem::path {
+    if (const char* env = std::getenv("VELOMIND_MODEL_DIR")) {
+        return std::filesystem::path(env);
+    }
+    auto repo_models = resolve_repo_path("models");
+    if (std::filesystem::exists(repo_models)) {
+        return repo_models;
+    }
+    if (const char* home = std::getenv("HOME")) {
+        auto user_cache = std::filesystem::path(home) / ".cache" / "velomind" / "models";
+        if (std::filesystem::exists(user_cache)) {
+            return user_cache;
+        }
+    }
+    auto sys_path = std::filesystem::path("/home/aiza/workspace/assets/ai-models");
+    if (std::filesystem::exists(sys_path)) {
+        return sys_path;
+    }
+    return sys_path;
+}
+
+// 获取 TinyLlama 模型 safetensors 文件路径（支持环境变量、仓库 models/、用户缓存与系统兼容路径）
+inline auto get_tinyllama_model_path() -> std::filesystem::path {
+    if (const char* env = std::getenv("VELOMIND_TINYLLAMA_PATH")) {
+        return std::filesystem::path(env);
+    }
+    if (const char* env = std::getenv("VELOMIND_TINYLLAMA_DIR")) {
+        return std::filesystem::path(env) / "model.safetensors";
+    }
+    if (const char* env = std::getenv("VELOMIND_MODEL_DIR")) {
+        auto p = std::filesystem::path(env) / "TinyLlama_v1.1" / "model.safetensors";
+        if (std::filesystem::exists(p)) return p;
+    }
+    auto repo_file = resolve_repo_path("models/TinyLlama_v1.1/model.safetensors");
+    if (std::filesystem::exists(repo_file)) return repo_file;
+
+    if (const char* home = std::getenv("HOME")) {
+        auto cache_file = std::filesystem::path(home) / ".cache" / "velomind" / "models" / "TinyLlama_v1.1" / "model.safetensors";
+        if (std::filesystem::exists(cache_file)) return cache_file;
+    }
+
+    auto sys_file = std::filesystem::path("/home/aiza/workspace/assets/ai-models/TinyLlama_v1.1/model.safetensors");
+    if (std::filesystem::exists(sys_file)) return sys_file;
+
+    return get_model_assets_root() / "TinyLlama_v1.1" / "model.safetensors";
+}
+
+// 获取 SmolLM2 模型目录（支持环境变量、仓库 models/、用户缓存与系统兼容路径）
+inline auto get_smollm2_model_dir() -> std::filesystem::path {
+    if (const char* env = std::getenv("VELOMIND_SMOLLM2_DIR")) {
+        return std::filesystem::path(env);
+    }
+    if (const char* env = std::getenv("VELOMIND_SMOLLM2_PATH")) {
+        auto p = std::filesystem::path(env);
+        return std::filesystem::is_directory(p) ? p : p.parent_path();
+    }
+    if (const char* env = std::getenv("VELOMIND_MODEL_DIR")) {
+        auto p = std::filesystem::path(env) / "SmolLM2-135M";
+        if (std::filesystem::exists(p)) return p;
+    }
+    auto repo_dir = resolve_repo_path("models/SmolLM2-135M");
+    if (std::filesystem::exists(repo_dir)) return repo_dir;
+
+    if (const char* home = std::getenv("HOME")) {
+        auto cache_dir = std::filesystem::path(home) / ".cache" / "velomind" / "models" / "SmolLM2-135M";
+        if (std::filesystem::exists(cache_dir)) return cache_dir;
+    }
+
+    auto sys_dir = std::filesystem::path("/home/aiza/workspace/assets/ai-models/SmolLM2-135M");
+    if (std::filesystem::exists(sys_dir)) return sys_dir;
+
+    return get_model_assets_root() / "SmolLM2-135M";
 }
 
 // 检查模型资产文件是否存在：流水线严格要求时报错 FAIL，普通环境显式调用 Catch2 SKIP 并标注原因分类

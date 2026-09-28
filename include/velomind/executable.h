@@ -20,6 +20,10 @@ struct ExternalBuffer {
     std::shared_ptr<void> owner;
 };
 
+namespace internal {
+class GraphCompiler;
+}
+
 // 已完成编译与内核解析的计算图执行计划；所属 Graph 必须覆盖其生命周期。
 // 维护顺序编译节点拓扑队列（CompiledNode）与设备特化上下文（如 CUDA 异步流与 cuBLAS 句柄）。
 class VELOMIND_CORE_EXPORT Executable {
@@ -73,6 +77,7 @@ public:
 
 private:
     friend class Graph;
+    friend class internal::GraphCompiler;
     std::unique_ptr<Impl> _impl;
 };
 

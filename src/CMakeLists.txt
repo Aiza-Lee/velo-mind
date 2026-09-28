@@ -13,6 +13,7 @@ set(VELOMIND_CORE_SRC
     internal/registry/shape.cpp
     internal/registry/storage.cpp
     internal/registry/memory_transfer.cpp
+    internal/graph_compiler.cpp
 )
 
 # 后端源码直接加入同一共享库，确保静态注册器不会被链接器丢弃。

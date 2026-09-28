@@ -16,6 +16,7 @@
 
 #include "llama_config.h"
 #include "llama_graph.h"
+#include "llama_interactive_console.h"
 #include "llama_tokenizer.h"
 
 namespace velomind::examples::llama {
@@ -181,11 +182,6 @@ private:
     std::string                           full_generated_text_;
     std::size_t                           prompt_tokens_count_ = 0;
 };
-
-void run_interactive_console(
-    LlamaEngine&      engine,
-    std::size_t       max_new_tokens = 64,
-    std::uint32_t     seed           = 42);
 
 auto make_top_p_sampler(float temperature, float top_p, std::mt19937& rng)
     -> std::function<std::int32_t(std::span<const float>)>;

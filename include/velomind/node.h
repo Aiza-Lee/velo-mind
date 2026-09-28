@@ -13,6 +13,10 @@ namespace velomind {
 
 class Graph;
 
+namespace internal {
+class GraphCompiler;
+}
+
 // 计算图 DAG 中的操作节点。
 // 持有算子描述符（OpDescriptor，含具体算子枚举与静态属性），并记录输入与输出张量存储指针；
 // 供 Graph 进行拓扑依赖分析、死代码消除（DCE）以及内存生命周期规划。
@@ -27,6 +31,7 @@ public:
 private:
     friend class Graph;
     friend struct GraphTestAccess;
+    friend class internal::GraphCompiler;
 
     OpDescriptor                     _op;
     std::vector<pConstTensorStorage> _inputs;

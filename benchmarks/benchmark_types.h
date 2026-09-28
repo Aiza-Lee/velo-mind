@@ -11,8 +11,8 @@ namespace velomind::benchmark {
 
 struct BenchmarkRunConfig {
     std::string              model_name   = "smollm2";
-    std::string              model_path   = "/home/aiza/workspace/assets/ai-models/SmolLM2-135M/model.safetensors";
-    std::string              tokenizer_path = "/home/aiza/workspace/assets/ai-models/SmolLM2-135M/tokenizer.json";
+    std::string              model_path;
+    std::string              tokenizer_path;
     std::vector<DeviceType>  devices      = {DeviceType::CPU, DeviceType::ISPC, DeviceType::CUDA, DeviceType::VULKAN};
     std::vector<std::size_t> seq_lens     = {1, 32, 128, 512, 2048};
     std::size_t              decode_steps = 4;

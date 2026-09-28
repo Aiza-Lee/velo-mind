@@ -7,6 +7,7 @@
 
 #include "model_loader.h"
 #include "tokenizer.h"
+#include "llama_model_finder.h"
 #include "velomind/safetensors.h"
 
 namespace velomind::examples::tinyllama {
@@ -47,6 +48,15 @@ TinyLlamaEngine::TinyLlamaEngine(EngineConfig cfg)
 
     if (cfg_.use_synthetic) {
         cfg_.model_config = kTiny;
+    } else if (cfg_.model_path.empty() || cfg_.tokenizer_path.empty()) {
+        auto assets = velomind::examples::llama::resolve_model_assets(
+            velomind::examples::llama::ModelFamily::TinyLlama,
+            cfg_.model_path,
+            cfg_.tokenizer_path);
+        if (assets.found) {
+            cfg_.model_path = assets.model_path.string();
+            cfg_.tokenizer_path = assets.tokenizer_path.string();
+        }
     }
     velomind::examples::llama::LlamaEngineConfig common{
         .model_path     = cfg_.model_path,

@@ -19,6 +19,23 @@ add_subdirectory(common/llama)
 add_subdirectory(tinyllama)
 add_subdirectory(smollm2)
 
+add_custom_target(download_smollm2
+    COMMAND bash "${CMAKE_SOURCE_DIR}/scripts/download_model.sh" smollm2
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Downloading SmolLM2-135M model assets..."
+)
+
+add_custom_target(download_tinyllama
+    COMMAND bash "${CMAKE_SOURCE_DIR}/scripts/download_model.sh" tinyllama
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Downloading TinyLlama_v1.1 model assets..."
+)
+
+add_custom_target(download_models
+    DEPENDS download_smollm2
+    COMMENT "Downloading default LLM model assets..."
+)
+
 include(CTest)
 if(BUILD_TESTING AND VELOMIND_BUILD_EXAMPLES)
     add_test(NAME example_basic     COMMAND example_basic)

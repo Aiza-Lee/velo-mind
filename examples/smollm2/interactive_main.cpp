@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "llama_engine.h"
+#include "llama_model_finder.h"
 #include "smollm2_engine.h"
 #include "velomind/device.h"
 
@@ -23,6 +24,7 @@ int main(int argc, char** argv) {
     float top_p       = 0.9f;
     std::size_t max_new_tokens = 32;
     std::string single_prompt;
+    bool auto_download = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -32,6 +34,7 @@ int main(int argc, char** argv) {
                       << "  --device <cpu|ispc|cuda|vulkan> Target compute device (default: ispc if available)\n"
                       << "  --model <path>         Path to model.safetensors\n"
                       << "  --tokenizer <path>     Path to tokenizer.json\n"
+                      << "  --download             Automatically download model assets if not present\n"
                       << "  --synthetic            Use fast synthetic (kSmolLM2_135M with random weights) for testing\n"
                       << "  --temp <float>         Sampling temperature (default: 0.7, 0 for greedy)\n"
                       << "  --top-p <float>        Nucleus sampling top-p (default: 0.9)\n"
@@ -52,6 +55,8 @@ int main(int argc, char** argv) {
             engine_cfg.model_path = argv[++i];
         } else if (arg == "--tokenizer" && i + 1 < argc) {
             engine_cfg.tokenizer_path = argv[++i];
+        } else if (arg == "--download") {
+            auto_download = true;
         } else if (arg == "--synthetic") {
             engine_cfg.use_synthetic = true;
         } else if (arg == "--temp" && i + 1 < argc) {
@@ -77,6 +82,25 @@ int main(int argc, char** argv) {
                 std::cerr << "       (Check Vulkan ICD / GPU drivers, or run with '--device ispc' / '--device cpu')\n";
             }
             return 1;
+        }
+        if (!engine_cfg.use_synthetic) {
+            auto assets = velomind::examples::llama::resolve_model_assets(
+                velomind::examples::llama::ModelFamily::SmolLM2,
+                engine_cfg.model_path,
+                engine_cfg.tokenizer_path
+            );
+            if (!assets.found) {
+                if (!velomind::examples::llama::ensure_model_assets_or_prompt(
+                        velomind::examples::llama::ModelFamily::SmolLM2, assets, auto_download)) {
+                    velomind::examples::llama::print_missing_model_guide(
+                        velomind::examples::llama::ModelFamily::SmolLM2, argv[0]);
+                    return 1;
+                }
+            }
+            engine_cfg.model_path = assets.model_path.string();
+            engine_cfg.tokenizer_path = assets.tokenizer_path.string();
+            std::cout << "Using model assets: " << assets.source_desc << "\n"
+                      << "  Directory: " << assets.model_dir.string() << "\n";
         }
 
         std::cout << "Initializing SmolLM2-135M engine on device ["
