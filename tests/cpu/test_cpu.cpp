@@ -40,6 +40,142 @@ TEST_CASE("Element-wise Add round-trip (Float32)", "[graph][cpu]") {
     REQUIRE(c_data[3] == 44.0f);
 }
 
+TEST_CASE("Element-wise Sub round-trip (Float32)", "[graph][cpu]") {
+    using namespace velomind;
+    using velomind_test::as_bytes;
+    using velomind_test::as_writeable_bytes;
+
+    Graph g;
+    auto a = g.input({4}, DataType::Float32);
+    auto b = g.input({4}, DataType::Float32);
+    auto c = g.op(Op::Sub, a, b);
+
+    auto exec = g.build(DeviceType::CPU);
+    REQUIRE(exec != nullptr);
+
+    std::vector<float> a_data = {15.0f, 25.0f, 35.0f, 45.0f};
+    std::vector<float> b_data = {10.0f, 20.0f, 30.0f, 40.0f};
+    a.copy_from_host(as_bytes(a_data));
+    b.copy_from_host(as_bytes(b_data));
+    exec->execute();
+
+    std::vector<float> c_data(c.numel());
+    c.copy_to_host(as_writeable_bytes(c_data));
+    for (float v : c_data) {
+        REQUIRE(v == 5.0f);
+    }
+}
+
+TEST_CASE("Element-wise Mul round-trip (Float32)", "[graph][cpu]") {
+    using namespace velomind;
+    using velomind_test::as_bytes;
+    using velomind_test::as_writeable_bytes;
+
+    Graph g;
+    auto a = g.input({4}, DataType::Float32);
+    auto b = g.input({4}, DataType::Float32);
+    auto c = g.op(Op::Mul, a, b);
+
+    auto exec = g.build(DeviceType::CPU);
+    REQUIRE(exec != nullptr);
+
+    std::vector<float> a_data = {2.0f, -3.0f, 4.0f, 0.5f};
+    std::vector<float> b_data = {3.0f, 2.0f, -5.0f, 8.0f};
+    a.copy_from_host(as_bytes(a_data));
+    b.copy_from_host(as_bytes(b_data));
+    exec->execute();
+
+    std::vector<float> c_data(c.numel());
+    c.copy_to_host(as_writeable_bytes(c_data));
+    REQUIRE(c_data[0] == 6.0f);
+    REQUIRE(c_data[1] == -6.0f);
+    REQUIRE(c_data[2] == -20.0f);
+    REQUIRE(c_data[3] == 4.0f);
+}
+
+TEST_CASE("Element-wise Neg round-trip (Float32)", "[graph][cpu]") {
+    using namespace velomind;
+    using velomind_test::as_bytes;
+    using velomind_test::as_writeable_bytes;
+
+    Graph g;
+    auto a = g.input({4}, DataType::Float32);
+    auto c = g.op(Op::Neg, a);
+
+    auto exec = g.build(DeviceType::CPU);
+    REQUIRE(exec != nullptr);
+
+    std::vector<float> a_data = {1.0f, -2.5f, 0.0f, 42.0f};
+    a.copy_from_host(as_bytes(a_data));
+    exec->execute();
+
+    std::vector<float> c_data(c.numel());
+    c.copy_to_host(as_writeable_bytes(c_data));
+    REQUIRE(c_data[0] == -1.0f);
+    REQUIRE(c_data[1] == 2.5f);
+    REQUIRE(c_data[2] == 0.0f);
+    REQUIRE(c_data[3] == -42.0f);
+}
+
+TEST_CASE("Integer and Boolean element-wise arithmetic on CPU", "[graph][cpu][dtypes]") {
+    using namespace velomind;
+    using velomind_test::as_bytes;
+    using velomind_test::as_writeable_bytes;
+
+    // 验证 Int32 加减乘
+    {
+        Graph g;
+        auto a = g.input({3}, DataType::Int32);
+        auto b = g.input({3}, DataType::Int32);
+        auto add_out = g.op(Op::Add, a, b);
+        auto sub_out = g.op(Op::Sub, a, b);
+        auto mul_out = g.op(Op::Mul, a, b);
+
+        auto exec = g.build(DeviceType::CPU);
+        REQUIRE(exec != nullptr);
+
+        std::vector<std::int32_t> a_data = {10, -5, 100};
+        std::vector<std::int32_t> b_data = {3, 7, -20};
+        a.copy_from_host(as_bytes(a_data));
+        b.copy_from_host(as_bytes(b_data));
+        exec->execute();
+
+        std::vector<std::int32_t> add_res(3), sub_res(3), mul_res(3);
+        add_out.copy_to_host(as_writeable_bytes(add_res));
+        sub_out.copy_to_host(as_writeable_bytes(sub_res));
+        mul_out.copy_to_host(as_writeable_bytes(mul_res));
+
+        REQUIRE(add_res == std::vector<std::int32_t>{13, 2, 80});
+        REQUIRE(sub_res == std::vector<std::int32_t>{7, -12, 120});
+        REQUIRE(mul_res == std::vector<std::int32_t>{30, -35, -2000});
+    }
+
+    // 验证 Int8 加减乘
+    {
+        Graph g;
+        auto a = g.input({3}, DataType::Int8);
+        auto b = g.input({3}, DataType::Int8);
+        auto add_out = g.op(Op::Add, a, b);
+        auto mul_out = g.op(Op::Mul, a, b);
+
+        auto exec = g.build(DeviceType::CPU);
+        REQUIRE(exec != nullptr);
+
+        std::vector<std::int8_t> a_data = {10, -5, 12};
+        std::vector<std::int8_t> b_data = {3, 7, -4};
+        a.copy_from_host(as_bytes(a_data));
+        b.copy_from_host(as_bytes(b_data));
+        exec->execute();
+
+        std::vector<std::int8_t> add_res(3), mul_res(3);
+        add_out.copy_to_host(as_writeable_bytes(add_res));
+        mul_out.copy_to_host(as_writeable_bytes(mul_res));
+
+        REQUIRE(add_res == std::vector<std::int8_t>{13, 2, 8});
+        REQUIRE(mul_res == std::vector<std::int8_t>{30, -35, -48});
+    }
+}
+
 TEST_CASE("MatMul then Add then Relu (Float32)", "[graph][cpu]") {
     using namespace velomind;
     using velomind_test::as_bytes;

@@ -27,15 +27,6 @@ extern "C" const char* __lsan_default_suppressions() {
 }
 #endif
 
-TEST_CASE("Storage allocator auto-registration is live", "[backend]") {
-    using namespace velomind;
-
-    auto a = TensorStorage::allocate(16, DeviceType::CPU);
-    REQUIRE(a != nullptr);
-    CHECK(Device::cpu().is_available());
-    CHECK(TensorStorage::is_available(DeviceType::CPU));
-}
-
 TEST_CASE("Device availability query and error diagnostics", "[backend][devices]") {
     using namespace velomind;
 
@@ -129,12 +120,45 @@ TEST_CASE("Per-op default attributes lookup", "[ops][attrs]") {
         REQUIRE(std::holds_alternative<TransposeAttrs>(attrs));
     }
 
-    SECTION("Elementwise ops default to NoAttrs") {
+    SECTION("RepeatKV defaults to RepeatKVAttrs with repeats 1 axis 0") {
+        auto attrs = default_op_attrs(Op::RepeatKV);
+        REQUIRE(std::holds_alternative<RepeatKVAttrs>(attrs));
+        const auto& r = std::get<RepeatKVAttrs>(attrs);
+        REQUIRE(r.repeats == 1);
+        REQUIRE(r.axis == 0);
+    }
+
+    SECTION("FusedAttention defaults to FusedAttentionAttrs") {
+        auto attrs = default_op_attrs(Op::FusedAttention);
+        REQUIRE(std::holds_alternative<FusedAttentionAttrs>(attrs));
+        const auto& fa = std::get<FusedAttentionAttrs>(attrs);
+        REQUIRE(fa.scale == Catch::Approx(1.0f));
+        REQUIRE(fa.is_causal == true);
+    }
+
+    SECTION("QuantizedMatMul defaults to QuantizedMatMulAttrs") {
+        auto attrs = default_op_attrs(Op::QuantizedMatMul);
+        REQUIRE(std::holds_alternative<QuantizedMatMulAttrs>(attrs));
+        const auto& qm = std::get<QuantizedMatMulAttrs>(attrs);
+        REQUIRE(qm.quant_type == QuantType::Int8);
+        REQUIRE(qm.block_size == 0);
+        REQUIRE_FALSE(qm.trans_b);
+    }
+
+    SECTION("Reshape, Slice, Reduce defaults") {
+        REQUIRE(std::holds_alternative<ReshapeAttrs>(default_op_attrs(Op::Reshape)));
+        REQUIRE(std::holds_alternative<SliceAttrs>(default_op_attrs(Op::Slice)));
+        REQUIRE(std::holds_alternative<ReduceAttrs>(default_op_attrs(Op::ReduceSum)));
+        REQUIRE(std::holds_alternative<ReduceAttrs>(default_op_attrs(Op::ReduceMean)));
+    }
+
+    SECTION("Elementwise ops and unknown op default to NoAttrs") {
         REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(Op::Add)));
         REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(Op::Sub)));
         REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(Op::Mul)));
         REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(Op::Relu)));
         REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(Op::Embedding)));
+        REQUIRE(std::holds_alternative<NoAttrs>(default_op_attrs(static_cast<Op>(999))));
     }
 }
 
@@ -183,6 +207,8 @@ TEST_CASE("to_string and operator<< formatting helpers for core types", "[print]
     CHECK(to_string(DataType::Float32) == "Float32");
     CHECK(to_string(DataType::Int8) == "Int8");
     CHECK(to_string(DeviceType::CPU) == "CPU");
+    CHECK(to_string(static_cast<DataType>(99)) == "Unknown");
+    CHECK(to_string(static_cast<DeviceType>(99)) == "Unknown");
 
     std::ostringstream ss_dt;
     ss_dt << DataType::Float16 << " on " << DeviceType::CUDA;

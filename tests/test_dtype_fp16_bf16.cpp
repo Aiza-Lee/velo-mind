@@ -1,4 +1,5 @@
 #include <cmath>
+#include <array>
 #include <vector>
 #include <span>
 
@@ -125,6 +126,27 @@ TEST_CASE("convert_dtype buffer conversions across precision formats", "[dtype][
     for (std::size_t i = 0; i < n; ++i) {
         CHECK(static_cast<float>(ints_f16[i]) == Catch::Approx(static_cast<float>(ints[i])));
     }
+
+    // 同类型快速直通路径 (memcpy)
+    std::vector<float> same_dst(n, 0.0f);
+    convert_dtype(orig_f32.data(), DataType::Float32, same_dst.data(), DataType::Float32, n);
+    CHECK(same_dst == orig_f32);
+
+    // Bool 与浮点/整型互转
+    std::array<bool, 3> bools = {true, false, true};
+    std::vector<float> bools_to_f32(3);
+    convert_dtype(bools.data(), DataType::Bool, bools_to_f32.data(), DataType::Float32, 3);
+    CHECK(bools_to_f32[0] == 1.0f);
+    CHECK(bools_to_f32[1] == 0.0f);
+    CHECK(bools_to_f32[2] == 1.0f);
+
+    // 零元素直通与防御
+    REQUIRE_NOTHROW(convert_dtype(nullptr, DataType::Float32, nullptr, DataType::Float16, 0));
+
+    // 非零元素空指针防御
+    float dummy = 1.0f;
+    REQUIRE_THROWS_AS(convert_dtype(nullptr, DataType::Float32, &dummy, DataType::Float16, 1), std::invalid_argument);
+    REQUIRE_THROWS_AS(convert_dtype(&dummy, DataType::Float32, nullptr, DataType::Float16, 1), std::invalid_argument);
 }
 
 TEST_CASE("dtype capability queries is_dtype_supported and is_op_dtype_supported", "[dtype][query]") {

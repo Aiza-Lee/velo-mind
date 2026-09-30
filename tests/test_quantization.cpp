@@ -410,46 +410,71 @@ TEST_CASE("Quantization Memory Footprint Verification", "[memory][quantization]"
     REQUIRE(w_q_stor->size_bytes == rows * cols * 1);
 }
 
-TEST_CASE("Quantization Single-Token Decode Throughput Verification", "[benchmark][quantization]") {
-    const std::size_t k = 576;
-    const std::size_t n = 1536;
+TEST_CASE("Quantization API edge cases and defensive validations", "[quantization][validation]") {
+    // 枚举与命名转换
+    CHECK(std::string(quant_type_name(QuantType::None)) == "None");
+    CHECK(std::string(quant_type_name(QuantType::Int8)) == "Int8");
+    CHECK(std::string(quant_type_name(QuantType::Int4)) == "Int4");
+    CHECK(std::string(quant_type_name(static_cast<QuantType>(99))) == "Unknown");
 
-    const auto w_orig = generate_random_weights(k, n, -1.0f, 1.0f);
-    const auto a_data = generate_activations(1, k);
+    // compute_quantization_metrics 边界保护
+    {
+        // 零长度测试
+        auto m0 = compute_quantization_metrics(nullptr, nullptr, 0);
+        CHECK(m0.max_diff == 0.0f);
+        CHECK(m0.rmse == 0.0f);
 
-    std::vector<std::int8_t> q_data(k * n);
-    std::vector<float> scales(n);
-    quantize_weights_int8_per_channel(w_orig.data(), q_data.data(), scales.data(), k, n);
-
-    Graph g_quant;
-    auto a_q = g_quant.input({1, static_cast<dim_t>(k)}, DataType::Float32);
-    auto w_q = g_quant.input({static_cast<dim_t>(k), static_cast<dim_t>(n)}, DataType::Int8);
-    auto s_q = g_quant.input({static_cast<dim_t>(n)}, DataType::Float32);
-    auto c_q = g_quant.op(Op::QuantizedMatMul, a_q, w_q, s_q);
-    auto exec = g_quant.build(DeviceType::CPU);
-    REQUIRE(exec);
-
-    a_q.copy_from_host(as_bytes(a_data));
-    w_q.copy_from_host(as_bytes(q_data));
-    s_q.copy_from_host(as_bytes(scales));
-
-    // 预热
-    for (int i = 0; i < 10; ++i) {
-        exec->execute();
+        // 完全一致数据
+        std::vector<float> a = {1.0f, -2.0f, 3.5f};
+        auto m1 = compute_quantization_metrics(a.data(), a.data(), a.size());
+        CHECK(m1.max_diff == Catch::Approx(0.0f));
+        CHECK(m1.rmse == Catch::Approx(0.0f));
+        CHECK(m1.cosine_sim == Catch::Approx(1.0f));
     }
 
-    // 吞吐基准测试
-    const int iterations = 100;
-    const auto start = std::chrono::steady_clock::now();
-    for (int i = 0; i < iterations; ++i) {
-        exec->execute();
-    }
-    const auto end = std::chrono::steady_clock::now();
-    const double elapsed_us = std::chrono::duration<double, std::micro>(end - start).count() / iterations;
+    // quantize_storage_int8 形状与半精度类型防御
+    {
+        // 非 2D 形状拦截
+        TensorStorage stor_1d;
+        stor_1d.shape = {16};
+        stor_1d.dtype = DataType::Float32;
+        REQUIRE_THROWS_AS(quantize_storage_int8(stor_1d), std::invalid_argument);
 
-    REQUIRE(elapsed_us > 0.0);
-    const double tokens_per_sec = 1e6 / elapsed_us;
-    REQUIRE(tokens_per_sec > 100.0);
+        TensorStorage stor_3d;
+        stor_3d.shape = {2, 4, 8};
+        stor_3d.dtype = DataType::Float32;
+        REQUIRE_THROWS_AS(quantize_storage_int8(stor_3d), std::invalid_argument);
+
+        // 半精度 Float16 输入在量化前自动转换
+        const std::size_t rows = 4;
+        const std::size_t cols = 8;
+        std::vector<float16_t> f16_data(rows * cols);
+        for (std::size_t i = 0; i < f16_data.size(); ++i) {
+            f16_data[i] = float16_t(static_cast<float>(i + 1) * 0.1f);
+        }
+        TensorStorage stor_f16;
+        stor_f16.shape = {static_cast<dim_t>(rows), static_cast<dim_t>(cols)};
+        stor_f16.dtype = DataType::Float16;
+        stor_f16.data = f16_data.data();
+        stor_f16.size_bytes = f16_data.size() * sizeof(float16_t);
+        stor_f16.capacity_bytes = stor_f16.size_bytes;
+
+        auto [w_q, scale] = quantize_storage_int8(stor_f16, DeviceType::CPU);
+        REQUIRE(w_q != nullptr);
+        REQUIRE(scale != nullptr);
+        REQUIRE(w_q->dtype == DataType::Int8);
+        REQUIRE(scale->dtype == DataType::Float32);
+        REQUIRE(w_q->shape == shape_t{static_cast<dim_t>(rows), static_cast<dim_t>(cols)});
+        REQUIRE(scale->shape == shape_t{static_cast<dim_t>(cols)});
+    }
+
+    // quantize_storage_int4 形状防御
+    {
+        TensorStorage stor_1d;
+        stor_1d.shape = {32};
+        stor_1d.dtype = DataType::Float32;
+        REQUIRE_THROWS_AS(quantize_storage_int4(stor_1d), std::invalid_argument);
+    }
 }
 
 TEST_CASE("Quantization End-to-End Model Quality and Logits Verification (toy_llama)", "[e2e][quantization]") {

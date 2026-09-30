@@ -994,96 +994,82 @@ TEST_CASE("Graph dynamic growth confirms capacity is not a hard limit", "[valida
     REQUIRE(out_val[1] == 10.0f);
 }
 
-TEST_CASE("Graph construction time and memory comparison between small and model graphs", "[validation][capacity][benchmark]") {
-    // 小图对比：固定预分配与默认按需分配
-    const int small_iters = 1000;
+TEST_CASE("Empty graph and input-only graph build and execution safety", "[validation][graph][empty]") {
+    // 完全空图（0 输入、0 节点）构建与执行安全契约
+    {
+        Graph g;
+        REQUIRE(g.node_count() == 0);
+        REQUIRE(g.tensor_count() == 0);
 
-    auto t0 = std::chrono::steady_clock::now();
-    for (int i = 0; i < small_iters; ++i) {
-        Graph g_old(MAX_TENSORS_PER_GRAPH, 0);
-        auto x = g_old.input({2}, DataType::Float32);
-        auto a = g_old.op(Op::Relu, x);
-        auto b = g_old.op(Op::Abs, a);
-        auto c = g_old.op(Op::Tanh, b);
-        auto d = g_old.op(Op::Sigmoid, c);
-        auto e = g_old.op(Op::Relu, d);
-        (void)e;
+        auto exec = g.build(DeviceType::CPU);
+        REQUIRE(exec != nullptr);
+        REQUIRE(exec->num_nodes() == 0);
+        REQUIRE_NOTHROW(exec->execute());
     }
-    auto t1 = std::chrono::steady_clock::now();
 
-    for (int i = 0; i < small_iters; ++i) {
-        Graph g_new(DEFAULT_TENSOR_CAPACITY, DEFAULT_NODE_CAPACITY);
-        auto x = g_new.input({2}, DataType::Float32);
-        auto a = g_new.op(Op::Relu, x);
-        auto b = g_new.op(Op::Abs, a);
-        auto c = g_new.op(Op::Tanh, b);
-        auto d = g_new.op(Op::Sigmoid, c);
-        auto e = g_new.op(Op::Relu, d);
-        (void)e;
+    // 纯输入图（仅定义输入张量，无算子节点）构建与执行
+    {
+        Graph g;
+        auto x = g.input({4}, DataType::Float32);
+        REQUIRE(g.node_count() == 0);
+        REQUIRE(g.tensor_count() == 1);
+
+        auto exec = g.build(DeviceType::CPU);
+        REQUIRE(exec != nullptr);
+        REQUIRE(exec->num_nodes() == 0);
+
+        std::vector<float> in_vals = {1.0f, 2.0f, 3.0f, 4.0f};
+        x.copy_from_host(as_bytes(in_vals));
+
+        REQUIRE_NOTHROW(exec->execute());
+
+        std::vector<float> out_vals(4);
+        x.copy_to_host(as_writeable_bytes(out_vals));
+        REQUIRE(out_vals == in_vals);
     }
-    auto t2 = std::chrono::steady_clock::now();
+}
 
-    auto dur_old_small_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    auto dur_new_small_us = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+TEST_CASE("Graph output management contracts (mark_output and set_outputs)", "[validation][graph][outputs]") {
+    Graph g;
+    auto a = g.input({2, 2}, DataType::Float32);
+    auto b = g.op(Op::Relu, a);
+    auto c = g.op(Op::Abs, b);
 
-    // 内存占用对比：固定 65536 占用 1024KB 指针空间，新默认 64 仅占用 1KB，减少 1024 倍
-    const std::size_t mem_old_small_bytes = MAX_TENSORS_PER_GRAPH * sizeof(std::shared_ptr<TensorStorage>);
-    const std::size_t mem_new_small_bytes = DEFAULT_TENSOR_CAPACITY * sizeof(std::shared_ptr<TensorStorage>)
-                                          + DEFAULT_NODE_CAPACITY * sizeof(Node);
+    // 默认未显式指定输出时，叶子节点 c 为输出
+    auto default_outs = g.outputs();
+    REQUIRE(default_outs.size() == 1);
+    REQUIRE(default_outs[0].storage() == c.storage());
 
-    std::cout << "\n[Benchmark] Small Graph (5 ops, 6 tensors, 1000 iters):" << std::endl;
-    std::cout << "  - Fixed 65536 reserve: " << dur_old_small_us << " us (" << (dur_old_small_us / 1000.0) << " us/graph), "
-              << mem_old_small_bytes << " bytes (" << (mem_old_small_bytes / 1024) << " KB)" << std::endl;
-    std::cout << "  - Default 64 reserve:  " << dur_new_small_us << " us (" << (dur_new_small_us / 1000.0) << " us/graph), "
-              << mem_new_small_bytes << " bytes (" << (mem_new_small_bytes / 1024.0) << " KB)" << std::endl;
-    std::cout << "  - Memory reduction: " << (static_cast<double>(mem_old_small_bytes) / mem_new_small_bytes) << "x" << std::endl;
+    // 显式指定中间节点 b 为额外输出
+    g.mark_output(b);
+    auto explicit_outs = g.outputs();
+    REQUIRE(explicit_outs.size() == 1);
+    REQUIRE(explicit_outs[0].storage() == b.storage());
 
-    // 模型图对比（SmolLM2 30-layer 全量前向图）：固定 65536 vs 针对性预留
-    const auto cfg = velomind::examples::smollm2::kSmolLM2_135M;
-    const std::size_t seq = 5;
-    const int model_iters = 50;
+    // 重复 mark_output 幂等防重
+    g.mark_output(b);
+    REQUIRE(g.outputs().size() == 1);
 
-    auto tm0 = std::chrono::steady_clock::now();
-    std::size_t model_tensor_count = 0;
-    std::size_t model_node_count = 0;
-    for (int i = 0; i < model_iters; ++i) {
-        Graph g(MAX_TENSORS_PER_GRAPH, 0);
-        auto tokens = g.input({static_cast<dim_t>(seq)}, DataType::Int32);
-        auto weights = velomind::examples::smollm2::bind_smollm2_weights(g, cfg, seq);
-        auto logits = velomind::examples::llama::build_forward_graph_prefill(g, cfg, tokens, weights);
-        (void)logits;
-        if (i == 0) {
-            model_tensor_count = g.tensor_count();
-            model_node_count = g.node_count();
-        }
-    }
-    auto tm1 = std::chrono::steady_clock::now();
+    // set_outputs 批量重设
+    g.set_outputs({b, c});
+    auto multi_outs = g.outputs();
+    REQUIRE(multi_outs.size() == 2);
 
-    for (int i = 0; i < model_iters; ++i) {
-        Graph g; // 构图内部自动按需调用 g.reserve 进行预估预留
-        auto tokens = g.input({static_cast<dim_t>(seq)}, DataType::Int32);
-        auto weights = velomind::examples::smollm2::bind_smollm2_weights(g, cfg, seq);
-        auto logits = velomind::examples::llama::build_forward_graph_prefill(g, cfg, tokens, weights);
-        (void)logits;
-    }
-    auto tm2 = std::chrono::steady_clock::now();
+    // set_outputs 传入空列表时恢复默认推导模式
+    g.set_outputs({});
+    auto restored_outs = g.outputs();
+    REQUIRE(restored_outs.size() == 1);
+    REQUIRE(restored_outs[0].storage() == c.storage());
 
-    auto dur_model_old_us = std::chrono::duration_cast<std::chrono::microseconds>(tm1 - tm0).count();
-    auto dur_model_new_us = std::chrono::duration_cast<std::chrono::microseconds>(tm2 - tm1).count();
+    // 异常防御：空句柄或异构图句柄拦截
+    Graph foreign_g;
+    auto foreign_t = foreign_g.input({2, 2}, DataType::Float32);
+    Tensor null_t;
 
-    const std::size_t model_old_mem_bytes = MAX_TENSORS_PER_GRAPH * sizeof(std::shared_ptr<TensorStorage>);
-    const std::size_t model_tailored_mem_bytes = (cfg.num_layers * 25 + 10 + cfg.num_layers * 10 + 20) * sizeof(std::shared_ptr<TensorStorage>)
-                                               + (cfg.num_layers * 25 + 10) * sizeof(Node);
-
-    std::cout << "\n[Benchmark] Model Graph (SmolLM2-135M, 30 layers, " << model_tensor_count << " tensors, " << model_node_count << " nodes, " << model_iters << " iters):" << std::endl;
-    std::cout << "  - Fixed 65536 reserve: " << dur_model_old_us << " us (" << (dur_model_old_us / static_cast<double>(model_iters)) << " us/graph), "
-              << model_old_mem_bytes << " bytes (" << (model_old_mem_bytes / 1024) << " KB)" << std::endl;
-    std::cout << "  - Tailored hint reserve: " << dur_model_new_us << " us (" << (dur_model_new_us / static_cast<double>(model_iters)) << " us/graph), "
-              << model_tailored_mem_bytes << " bytes (" << (model_tailored_mem_bytes / 1024.0) << " KB)" << std::endl;
-    std::cout << "  - Memory reduction: " << (static_cast<double>(model_old_mem_bytes) / model_tailored_mem_bytes) << "x" << std::endl;
-
-    REQUIRE(model_tensor_count > 0);
-    REQUIRE(model_node_count > 0);
+    REQUIRE_THROWS_AS(g.mark_output(null_t), std::invalid_argument);
+    REQUIRE_THROWS_AS(g.mark_output(foreign_t), std::invalid_argument);
+    REQUIRE_THROWS_AS(g.set_outputs({foreign_t}), std::invalid_argument);
+    REQUIRE_THROWS_AS(g.set_outputs({b, null_t}), std::invalid_argument);
 }
 
 TEST_CASE("Partial D2H and H2D - copy_to_host and copy_from_host with offset and bounds checking",

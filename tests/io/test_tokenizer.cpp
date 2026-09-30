@@ -7,23 +7,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "examples/tinyllama/tokenizer.h"
+#include "../test_model_assets.h"
 
 namespace {
 
 std::string find_test_model() {
-    namespace fs = std::filesystem;
-    const std::vector<fs::path> candidates = {
-        "examples/tinyllama/testdata/test.model",
-        "../examples/tinyllama/testdata/test.model",
-        "../../examples/tinyllama/testdata/test.model",
-        "/home/aiza/workspace/dev/velo-mind/examples/tinyllama/testdata/test.model",
-    };
-    for (const auto& p : candidates) {
-        if (fs::exists(p)) {
-            return p.string();
-        }
+    auto path = velomind_test::resolve_repo_path("examples/tinyllama/testdata/test.model");
+    if (!std::filesystem::exists(path)) {
+        velomind_test::require_or_skip_asset(path, "TinyLlama sentencepiece test.model");
+        return "";
     }
-    return "";
+    return path.string();
 }
 
 }
@@ -50,7 +44,6 @@ TEST_CASE("Tokenizer - load nonexistent file", "[tokenizer][tinyllama]") {
 TEST_CASE("Tokenizer - load, encode, and decode round-trip", "[tokenizer][tinyllama]") {
     const std::string model_path = find_test_model();
     if (model_path.empty()) {
-        WARN("test.model not found, skipping live encode/decode test");
         return;
     }
 

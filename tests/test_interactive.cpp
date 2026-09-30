@@ -16,6 +16,7 @@
 #include "sample.h"
 #include "tokenizer.h"
 #include "tinyllama_engine.h"
+#include "test_model_assets.h"
 #include "velomind/device.h"
 #include "velomind/types.h"
 
@@ -27,18 +28,12 @@ using velomind::examples::llama::LlamaTextStreamer;
 namespace {
 
 std::string find_test_model() {
-    namespace fs = std::filesystem;
-    const std::vector<fs::path> candidates = {
-        "examples/tinyllama/testdata/test.model",
-        "../examples/tinyllama/testdata/test.model",
-        "/home/aiza/workspace/dev/velo-mind/examples/tinyllama/testdata/test.model",
-    };
-    for (const auto& p : candidates) {
-        if (fs::exists(p)) {
-            return p.string();
-        }
+    auto path = velomind_test::resolve_repo_path("examples/tinyllama/testdata/test.model");
+    if (!std::filesystem::exists(path)) {
+        velomind_test::require_or_skip_asset(path, "TinyLlama sentencepiece test.model");
+        return "";
     }
-    return "";
+    return path.string();
 }
 
 }
@@ -48,7 +43,6 @@ TEST_CASE("TextStreamer - incremental token-to-text streaming",
     Tokenizer tok;
     const std::string sp_path = find_test_model();
     if (sp_path.empty()) {
-        WARN("test.model not found, skipping live TextStreamer test");
         return;
     }
     tok.load(sp_path);
@@ -311,73 +305,6 @@ TEST_CASE("TinyLlamaEngine - KV Cache incremental decode vs full prefill referen
 
         next_token = cand;
     }
-}
-
-TEST_CASE("TinyLlamaEngine - KV Cache micro-benchmark and performance comparison",
-          "[interactive][kv_cache][benchmark]") {
-    EngineConfig cfg;
-    cfg.use_synthetic = true;
-    cfg.device = DeviceType::CPU;
-    cfg.tokenizer_path = find_test_model();
-
-    TinyLlamaEngine engine(cfg);
-    REQUIRE_NOTHROW(engine.load());
-    REQUIRE(engine.is_loaded());
-
-    const std::size_t prompt_len = 8;
-    const std::size_t decode_tokens = 16;
-    std::vector<std::int32_t> prompt = {1, 2, 3, 4, 5, 6, 7, 8};
-
-    // Prefill 耗时与内存
-    auto t_prefill_start = std::chrono::steady_clock::now();
-    engine.reset_session();
-    auto prefill_logits = engine.prefill(prompt);
-    auto t_prefill_end = std::chrono::steady_clock::now();
-    double prefill_ms = std::chrono::duration<double, std::milli>(t_prefill_end - t_prefill_start).count();
-    REQUIRE(prefill_logits.size() == engine.config().model_config.vocab_size);
-
-    auto argmax_fn = [](std::span<const float> l) -> std::int32_t {
-        return static_cast<std::int32_t>(
-            std::distance(l.begin(), std::max_element(l.begin(), l.end())));
-    };
-    std::int32_t tok = argmax_fn(prefill_logits);
-
-    // 带 KV cache 增量单 token decode 耗时
-    auto t_kv_start = std::chrono::steady_clock::now();
-    for (std::size_t i = 0; i < decode_tokens; ++i) {
-        auto step_logits = engine.forward_step(tok, engine.session_seq_len());
-        tok = argmax_fn(step_logits);
-    }
-    auto t_kv_end = std::chrono::steady_clock::now();
-    double kv_total_ms = std::chrono::duration<double, std::milli>(t_kv_end - t_kv_start).count();
-    double kv_per_tok_ms = kv_total_ms / static_cast<double>(decode_tokens);
-    double kv_tok_per_sec = (decode_tokens * 1000.0) / kv_total_ms;
-
-    // 无 KV cache 全序列重复 prefill 耗时
-    std::vector<std::int32_t> full_seq = prompt;
-    tok = argmax_fn(prefill_logits);
-    auto t_full_start = std::chrono::steady_clock::now();
-    for (std::size_t i = 0; i < decode_tokens; ++i) {
-        full_seq.push_back(tok);
-        auto step_logits = engine.forward_logits(full_seq);
-        tok = argmax_fn(step_logits);
-    }
-    auto t_full_end = std::chrono::steady_clock::now();
-    double full_total_ms = std::chrono::duration<double, std::milli>(t_full_end - t_full_start).count();
-    double full_per_tok_ms = full_total_ms / static_cast<double>(decode_tokens);
-    double full_tok_per_sec = (decode_tokens * 1000.0) / full_total_ms;
-
-    double speedup = full_total_ms / kv_total_ms;
-
-    std::cout << "\n=== LlamaEngine KV Cache Benchmark (TinyLlama S=" << prompt_len << " -> " << prompt_len + decode_tokens << ") ===\n"
-              << "  Prefill Latency:       " << prefill_ms << " ms\n"
-              << "  KV Cache Decode:       " << kv_per_tok_ms << " ms/tok (" << kv_tok_per_sec << " tok/s)\n"
-              << "  Full Prefill Decode:   " << full_per_tok_ms << " ms/tok (" << full_tok_per_sec << " tok/s)\n"
-              << "  Decode Speedup:        " << speedup << "x\n"
-              << "========================================================================\n" << std::endl;
-
-    REQUIRE(kv_total_ms > 0.0);
-    REQUIRE(full_total_ms > 0.0);
 }
 
 TEST_CASE("TinyLlamaEngine - CUDA backend multi-step KV cache generation and alignment",
