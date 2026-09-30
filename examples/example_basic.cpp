@@ -20,11 +20,11 @@ int main(int argc, char** argv) {
             if (d) {
                 device = *d;
             } else {
-                std::cerr << std::format("未知设备类型: {} (可选: cpu, ispc, cuda, vulkan)\n", argv[i]);
+                std::cerr << std::format("未知设备类型: {} (可选: cpu, ispc, cuda)\n", argv[i]);
                 return 1;
             }
         } else if (arg == "--help" || arg == "-h") {
-            std::cout << std::format("用法: {} [--device <cpu|ispc|cuda|vulkan>]\n", argv[0]);
+            std::cout << std::format("用法: {} [--device <cpu|ispc|cuda>]\n", argv[0]);
             return 0;
         }
     }

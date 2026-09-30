@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include <vulkan/vulkan.h>
-
 #ifdef VELOMIND_ENABLE_CUDA
 #include "cuda/cuda_context.h"
 #endif
@@ -37,13 +35,6 @@ namespace velomind::internal {
 
 namespace {
 
-// 扩展状态与 TensorStorage 内存连续布局，供 Vulkan 算子反查 VkBuffer。
-struct VulkanExt {
-    VkBuffer        buffer   = VK_NULL_HANDLE;
-    VkDeviceMemory  memory   = VK_NULL_HANDLE;
-    void*           mapped   = nullptr;
-};
-
 inline auto _make_alias_storage(
     const std::shared_ptr<TensorStorage>& slot_storage,
     const shape_t& shape,
@@ -53,32 +44,6 @@ inline auto _make_alias_storage(
     std::size_t offset_bytes,
     DeviceType device
 ) -> std::shared_ptr<TensorStorage> {
-    if (device == DeviceType::VULKAN) {
-        auto* raw = static_cast<TensorStorage*>(
-            ::operator new(sizeof(TensorStorage) + sizeof(VulkanExt)));
-        new (raw) TensorStorage{};
-        auto* ext = new (reinterpret_cast<VulkanExt*>(raw + 1)) VulkanExt{};
-        const auto* slot_ext = reinterpret_cast<const VulkanExt*>(slot_storage.get() + 1);
-        ext->buffer = slot_ext->buffer;
-        ext->memory = slot_ext->memory;
-        ext->mapped = slot_ext->mapped;
-        raw->shape = shape;
-        raw->strides = strides.empty() ? default_strides(shape) : strides;
-        raw->offset_bytes = offset_bytes;
-        raw->capacity_bytes = slot_storage ? slot_storage->capacity_bytes : size_bytes;
-        raw->dtype = dtype;
-        raw->device = DeviceType::VULKAN;
-        raw->size_bytes = size_bytes;
-        raw->data = slot_ext->mapped ? static_cast<char*>(slot_ext->mapped) + offset_bytes : nullptr;
-        raw->external_owner = slot_storage;
-        return std::shared_ptr<TensorStorage>(raw, [](TensorStorage* p) {
-            if (!p) return;
-            p->~TensorStorage();
-            reinterpret_cast<VulkanExt*>(p + 1)->~VulkanExt();
-            ::operator delete(p);
-        });
-    }
-
     auto s = std::make_shared<TensorStorage>();
     s->shape = shape;
     s->strides = strides.empty() ? default_strides(shape) : strides;
@@ -128,7 +93,7 @@ struct ArenaPlan {
     std::size_t               total_size_bytes = 0;
 };
 
-// 物理对齐约束：满足 Vulkan minStorageBufferOffsetAlignment、AVX-512、CUDA Warp 与缓存行要求
+// 物理对齐约束：满足 AVX-512、CUDA Warp 与缓存行要求
 constexpr std::size_t ARENA_ALIGNMENT = 256;
 
 inline auto _align_up(std::size_t size, std::size_t alignment) -> std::size_t {

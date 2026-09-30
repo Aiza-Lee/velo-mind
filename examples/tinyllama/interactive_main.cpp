@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
         if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: tinyllama_chat [options]\n\n"
                       << "Options:\n"
-                      << "  --device <cpu|ispc|cuda|vulkan> Target compute device (default: ispc if available)\n"
+                      << "  --device <cpu|ispc|cuda> Target compute device (default: ispc if available)\n"
                       << "  --model <path>         Path to model.safetensors\n"
                       << "  --tokenizer <path>     Path to tokenizer.model\n"
                       << "  --download             Automatically download model assets if not present\n"
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
             std::string dev_str = argv[++i];
             auto parsed_dev = Device::from_string(dev_str);
             if (!parsed_dev) {
-                std::cerr << "Unknown device: " << dev_str << " (expected cpu, ispc, cuda, or vulkan)\n";
+                std::cerr << "Unknown device: " << dev_str << " (expected cpu, ispc, or cuda)\n";
                 return 1;
             }
             engine_cfg.device = parsed_dev->type();
@@ -74,8 +74,6 @@ int main(int argc, char** argv) {
                       << "] is not available or operational on this system.\n";
             if (engine_cfg.device == DeviceType::CUDA) {
                 std::cerr << "       (Check GPU drivers / nvidia-smi status, or run with '--device ispc' or '--device cpu')\n";
-            } else if (engine_cfg.device == DeviceType::VULKAN) {
-                std::cerr << "       (Check Vulkan ICD / GPU drivers, or run with '--device ispc' / '--device cpu')\n";
             }
             return 1;
         }

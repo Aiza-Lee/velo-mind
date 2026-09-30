@@ -9,9 +9,6 @@
 #ifdef VELOMIND_ENABLE_CUDA
 #include "cuda/cuda_context.h"
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-#include "internal/vulkan_backend.h"
-#endif
 
 namespace velomind {
 
@@ -20,13 +17,6 @@ Executable::~Executable() {
     if (_impl && _impl->device == DeviceType::CUDA && _impl->device_context) {
         try {
             static_cast<backend::cuda::CudaContext*>(_impl->device_context.get())->synchronize();
-        } catch (...) {}
-    }
-#endif
-#ifdef VELOMIND_ENABLE_VULKAN
-    if (_impl && _impl->device == DeviceType::VULKAN) {
-        try {
-            backend_vulkan::sync_vulkan_batch_if_pending();
         } catch (...) {}
     }
 #endif
@@ -58,12 +48,6 @@ auto Executable::execute() -> void {
         scoped_cuda = std::make_unique<backend::cuda::ScopedCudaContext>(cuda_ctx);
     }
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-    std::unique_ptr<backend_vulkan::ScopedVulkanBatch> scoped_vulkan;
-    if (_impl->device == DeviceType::VULKAN) {
-        scoped_vulkan = std::make_unique<backend_vulkan::ScopedVulkanBatch>();
-    }
-#endif
 
     for (auto& cn : _impl->topo) {
         const auto& desc = *static_cast<const OpDescriptor*>(cn.attrs.get());
@@ -75,11 +59,6 @@ auto Executable::execute() -> void {
 #ifdef VELOMIND_ENABLE_CUDA
                 if (_impl->device == DeviceType::CUDA && _impl->device_context) {
                     static_cast<backend::cuda::CudaContext*>(_impl->device_context.get())->synchronize();
-                }
-#endif
-#ifdef VELOMIND_ENABLE_VULKAN
-                if (_impl->device == DeviceType::VULKAN) {
-                    backend_vulkan::sync_vulkan_batch_if_pending();
                 }
 #endif
                 const auto transfer = internal::get_memory_transfer(indices.device);
@@ -114,8 +93,6 @@ auto Executable::bind_input(Tensor t, ExternalBuffer external_buffer) -> void {
     auto* s = g->tensor_storage_at(t.index());
     if (external_buffer.device != _impl->device || s->device != _impl->device)
         throw std::invalid_argument("Executable::bind_input: device mismatch");
-    if (_impl->device == DeviceType::VULKAN)
-        throw std::invalid_argument("Executable::bind_input: Vulkan external buffers require VkBuffer binding");
     if (external_buffer.capacity_bytes < s->size_bytes)
         throw std::invalid_argument("Executable::bind_input: insufficient buffer capacity");
     if (s->size_bytes > 0 && (!external_buffer.data || !external_buffer.owner))

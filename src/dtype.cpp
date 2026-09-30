@@ -26,10 +26,6 @@ auto is_dtype_supported(DeviceType device, DataType dtype) noexcept -> bool {
         case DeviceType::CUDA:
             return dtype == DataType::Float32 || dtype == DataType::Int32 ||
                    dtype == DataType::Float16 || dtype == DataType::BFloat16;
-        case DeviceType::VULKAN:
-            return dtype == DataType::Float32 || dtype == DataType::Int32 ||
-                   dtype == DataType::Int8    || dtype == DataType::Bool  ||
-                   dtype == DataType::Float16 || dtype == DataType::BFloat16;
     }
     return false;
 }

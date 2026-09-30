@@ -25,10 +25,6 @@ if(VELOMIND_ENABLE_ISPC)
     list(APPEND VELOMIND_TESTS_SRC ispc/test_ispc.cpp)
 endif()
 
-if(VELOMIND_ENABLE_VULKAN)
-    list(APPEND VELOMIND_TESTS_SRC vulkan/test_vulkan.cpp)
-endif()
-
 add_executable(velomind_tests ${VELOMIND_TESTS_SRC})
 target_link_libraries(velomind_tests PRIVATE
     velomind_core
@@ -58,10 +54,6 @@ endif()
 
 if(VELOMIND_ENABLE_ISPC)
     target_compile_definitions(velomind_tests PRIVATE VELOMIND_ENABLE_ISPC=1)
-endif()
-
-if(VELOMIND_ENABLE_VULKAN)
-    target_compile_definitions(velomind_tests PRIVATE VELOMIND_ENABLE_VULKAN=1)
 endif()
 
 if(VELOMIND_ENABLE_ASAN)

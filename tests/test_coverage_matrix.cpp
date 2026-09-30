@@ -94,9 +94,6 @@ inline auto get_available_devices() -> std::vector<DeviceType> {
 #ifdef VELOMIND_ENABLE_CUDA
     if (Device::cuda().is_available()) devices.push_back(DeviceType::CUDA);
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-    if (Device::vulkan().is_available()) devices.push_back(DeviceType::VULKAN);
-#endif
     return devices;
 }
 
@@ -389,16 +386,9 @@ TEST_CASE("Coverage Matrix - Duplicate inputs, self-referential ops and aliasing
             {
                 Graph g;
                 auto x = g.input({6}, DataType::Float32);
-                Tensor z;
-                if (dev == DeviceType::VULKAN) {
-                    auto y1 = g.op(Op::Sigmoid, x);
-                    auto y2 = g.op(Op::Mul, x, x);
-                    z = g.op(Op::Add, y1, y2);
-                } else {
-                    auto y1 = g.op(Op::Relu, x);
-                    auto y2 = g.op(Op::Abs, x);
-                    z = g.op(Op::Add, y1, y2);
-                }
+                auto y1 = g.op(Op::Relu, x);
+                auto y2 = g.op(Op::Abs, x);
+                auto z = g.op(Op::Add, y1, y2);
 
                 auto exec = g.build(dev);
                 REQUIRE(exec);
@@ -411,15 +401,9 @@ TEST_CASE("Coverage Matrix - Duplicate inputs, self-referential ops and aliasing
                 z.copy_to_host(std::as_writable_bytes(std::span(z_out)));
 
                 for (std::size_t i = 0; i < 6; ++i) {
-                    if (dev == DeviceType::VULKAN) {
-                        float sig_v = 1.0f / (1.0f + std::exp(-in_data[i]));
-                        float sq_v = in_data[i] * in_data[i];
-                        CHECK(z_out[i] == Catch::Approx(sig_v + sq_v).margin(1e-4f));
-                    } else {
-                        float relu_v = in_data[i] > 0.0f ? in_data[i] : 0.0f;
-                        float abs_v = std::abs(in_data[i]);
-                        CHECK(z_out[i] == Catch::Approx(relu_v + abs_v).margin(1e-5f));
-                    }
+                    float relu_v = in_data[i] > 0.0f ? in_data[i] : 0.0f;
+                    float abs_v = std::abs(in_data[i]);
+                    CHECK(z_out[i] == Catch::Approx(relu_v + abs_v).margin(1e-5f));
                 }
             }
         }

@@ -45,7 +45,7 @@ public:
     auto is_alias()       const -> bool;
 
     // 返回底层缓冲区的首地址（已叠加 offset_bytes 视图偏移）。
-    // 若张量位于 CUDA/Vulkan 等非 CPU 设备，返回指针为设备显存地址，主机端不可直接解引用。
+    // 若张量位于 CUDA 等非 CPU 设备，返回指针为设备显存地址，主机端不可直接解引用。
     auto data() const -> const void*;
     auto data()       -> void*;
 

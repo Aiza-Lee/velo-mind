@@ -28,10 +28,6 @@ if(VELOMIND_ENABLE_ISPC)
     target_compile_definitions(benchmark_baseline PRIVATE VELOMIND_ENABLE_ISPC=1)
 endif()
 
-if(VELOMIND_ENABLE_VULKAN)
-    target_compile_definitions(benchmark_baseline PRIVATE VELOMIND_ENABLE_VULKAN=1)
-endif()
-
 if(VELOMIND_ENABLE_ASAN)
     target_compile_options(benchmark_baseline PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
     target_link_options(benchmark_baseline PRIVATE -fsanitize=address,undefined)

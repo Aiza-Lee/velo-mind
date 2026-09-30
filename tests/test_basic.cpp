@@ -17,10 +17,9 @@
 #include "internal/registry/kernel.h"
 
 #if defined(__SANITIZE_ADDRESS__) || (defined(__has_feature) && __has_feature(address_sanitizer))
-// 压制系统驱动层与 libdbus-1 / Vulkan ICD 内部单例未释放导致的 LSan 误报
+// 压制系统驱动层与 libdbus-1 内部单例未释放导致的 LSan 误报
 extern "C" const char* __lsan_default_suppressions() {
     return "leak:libdbus-1\n"
-           "leak:libvulkan\n"
            "leak:libnvidia\n"
            "leak:libGLX\n"
            "leak:libdrm\n"
@@ -264,10 +263,6 @@ TEST_CASE("Device class features, string parsing, memory info, and support queri
     CHECK(cuda1.index() == 1);
     CHECK(cuda1.name() == "CUDA:1");
 
-    auto vulkan = Device::vulkan();
-    CHECK(vulkan.type() == DeviceType::VULKAN);
-    CHECK(vulkan.index() == 0);
-
     // 隐式转换为 DeviceType
     DeviceType dt = cpu;
     CHECK(dt == DeviceType::CPU);
@@ -279,8 +274,6 @@ TEST_CASE("Device class features, string parsing, memory info, and support queri
     CHECK(Device::from_string("cuda") == Device::cuda(0));
     CHECK(Device::from_string("cuda:0") == Device::cuda(0));
     CHECK(Device::from_string("cuda:2") == Device::cuda(2));
-    CHECK(Device::from_string("vulkan") == Device::vulkan(0));
-    CHECK(Device::from_string("vulkan:1") == Device::vulkan(1));
 
     // 非法字符串解析
     CHECK(Device::from_string("") == std::nullopt);
@@ -358,9 +351,6 @@ TEST_CASE("Operator kernel registration macros", "[registry][kernel]") {
 #ifdef VELOMIND_ENABLE_CUDA
     CHECK(resolve_op_kernel(Op::Add, bin_f32, DataType::Float32, DeviceType::CUDA) != nullptr);
     CHECK(resolve_op_kernel(Op::Add, bin_i32, DataType::Int32, DeviceType::CUDA) != nullptr);
-#endif
-#ifdef VELOMIND_ENABLE_VULKAN
-    CHECK(resolve_op_kernel(Op::Add, bin_f32, DataType::Float32, DeviceType::VULKAN) != nullptr);
 #endif
 
     std::array<DataType, 1> un_f32{DataType::Float32};

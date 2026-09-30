@@ -19,8 +19,7 @@ int main(int argc, char** argv) {
             if (d == "cpu")         cfg.devices = {DeviceType::CPU};
             else if (d == "ispc")   cfg.devices = {DeviceType::ISPC};
             else if (d == "cuda")   cfg.devices = {DeviceType::CUDA};
-            else if (d == "vulkan") cfg.devices = {DeviceType::VULKAN};
-            else if (d == "all")    cfg.devices = {DeviceType::CPU, DeviceType::ISPC, DeviceType::CUDA, DeviceType::VULKAN};
+            else if (d == "all")    cfg.devices = {DeviceType::CPU, DeviceType::ISPC, DeviceType::CUDA};
         } else if (arg == "--seq-lens" && i + 1 < argc) {
             cfg.seq_lens.clear();
             std::string s = argv[++i];
@@ -48,7 +47,7 @@ int main(int argc, char** argv) {
         } else if (arg == "--help" || arg == "-h") {
             std::cout << std::format(
                 "用法: {} [选项]\n"
-                "  --device <cpu|ispc|cuda|vulkan|all>  目标计算设备 (默认: 全部可用设备)\n"
+                "  --device <cpu|ispc|cuda|all>        目标计算设备 (默认: 全部可用设备)\n"
                 "  --seq-lens <s1,s2,...>              测试序列长度列表 (例如: 1,32,128,512,2048)\n"
                 "  --iters <N>                         测量迭代轮数 (默认: 5)\n"
                 "  --warmup <W>                        预热执行轮数 (默认: 1)\n"

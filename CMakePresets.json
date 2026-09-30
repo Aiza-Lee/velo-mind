@@ -57,7 +57,7 @@
         {
             "name": "cpu-only",
             "displayName": "CPU Only",
-            "description": "Host-only build with ISPC and Vulkan, without CUDA",
+            "description": "Host-only build with ISPC, without CUDA",
             "inherits": "default",
             "binaryDir": "${sourceDir}/build/cpu-only",
             "cacheVariables": {
@@ -69,14 +69,13 @@
         {
             "name": "pure-cpu",
             "displayName": "Pure CPU",
-            "description": "Strict pure CPU build without CUDA, ISPC, or Vulkan accelerators",
+            "description": "Strict pure CPU build without CUDA or ISPC accelerators",
             "inherits": "default",
             "binaryDir": "${sourceDir}/build/pure-cpu",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "VELOMIND_ENABLE_CUDA": "OFF",
                 "VELOMIND_ENABLE_ISPC": "OFF",
-                "VELOMIND_ENABLE_VULKAN": "OFF",
                 "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
             }
         },

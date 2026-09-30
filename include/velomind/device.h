@@ -34,9 +34,8 @@ public:
     static constexpr auto cpu() noexcept -> Device { return Device(DeviceType::CPU, 0); }
     static constexpr auto ispc() noexcept -> Device { return Device(DeviceType::ISPC, 0); }
     static constexpr auto cuda(int index = 0) noexcept -> Device { return Device(DeviceType::CUDA, index); }
-    static constexpr auto vulkan(int index = 0) noexcept -> Device { return Device(DeviceType::VULKAN, index); }
 
-    // 字符串解析 (如 "cpu", "ispc", "cuda", "cuda:0", "vulkan")
+    // 字符串解析 (如 "cpu", "ispc", "cuda", "cuda:0")
     static auto from_string(std::string_view str) -> std::optional<Device>;
 
     // 机器设备自动探测与枚举

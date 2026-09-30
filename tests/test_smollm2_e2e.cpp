@@ -152,12 +152,6 @@ TEST_CASE("SmolLM2-135M - 5-token prefill synthetic CUDA", "[smollm2][cuda]") {
     run_smollm2_synthetic(DeviceType::CUDA);
 }
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-TEST_CASE("SmolLM2-135M - 5-token prefill synthetic Vulkan", "[smollm2][vulkan]") {
-    if (!Device::vulkan().is_available()) SKIP("Vulkan 设备不可用");
-    run_smollm2_synthetic(DeviceType::VULKAN);
-}
-#endif
 
 static void check_smollm2_reference(DeviceType device) {
     const auto ref_path = velomind_test::require_or_skip_asset(
@@ -251,13 +245,6 @@ TEST_CASE("SmolLM2-135M - 5-token prefill CUDA vs HuggingFace reference",
           "[.][smollm2][slow][cuda]") {
     if (!Device::cuda().is_available()) SKIP("CUDA 设备不可用");
     check_smollm2_reference(DeviceType::CUDA);
-}
-#endif
-#ifdef VELOMIND_ENABLE_VULKAN
-TEST_CASE("SmolLM2-135M - 5-token prefill Vulkan vs HuggingFace reference",
-          "[.][smollm2][slow][vulkan]") {
-    if (!Device::vulkan().is_available()) SKIP("Vulkan 设备不可用");
-    check_smollm2_reference(DeviceType::VULKAN);
 }
 #endif
 

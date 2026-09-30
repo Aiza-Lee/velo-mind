@@ -67,9 +67,6 @@ TEST_CASE("Softmax axes ISPC", "[softmax][ispc]") { check_softmax(DeviceType::IS
 #ifdef VELOMIND_ENABLE_CUDA
 TEST_CASE("Softmax axes CUDA", "[softmax][cuda]") { check_softmax(DeviceType::CUDA); }
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-TEST_CASE("Softmax axes Vulkan", "[softmax][vulkan]") { check_softmax(DeviceType::VULKAN); }
-#endif
 
 TEST_CASE("Softmax rejects invalid metadata before allocation", "[softmax]") {
     for (const shape_t& shape : {shape_t{}, shape_t{0}, shape_t{2, 0, 3}}) {

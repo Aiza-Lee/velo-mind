@@ -95,11 +95,6 @@ TEST_CASE("TinyLlama - 5-token prefill on fixed small asset (CUDA)", "[llm][asse
     run_tinyllama_fixed_asset(DeviceType::CUDA);
 }
 #endif
-#ifdef VELOMIND_ENABLE_VULKAN
-TEST_CASE("TinyLlama - 5-token prefill on fixed small asset (Vulkan)", "[llm][asset][vulkan]") {
-    run_tinyllama_fixed_asset(DeviceType::VULKAN);
-}
-#endif
 
 TEST_CASE("TinyLlama - 5-token prefill vs HuggingFace reference", "[.][llm][slow]") {
     const auto ref_path = velomind_test::require_or_skip_asset(

@@ -41,7 +41,6 @@ auto Device::from_string(std::string_view str) -> std::optional<Device> {
     if (lower_base == "cpu") return Device(DeviceType::CPU, index);
     if (lower_base == "ispc") return Device(DeviceType::ISPC, index);
     if (lower_base == "cuda") return Device(DeviceType::CUDA, index);
-    if (lower_base == "vulkan") return Device(DeviceType::VULKAN, index);
 
     return std::nullopt;
 }
@@ -68,15 +67,11 @@ auto Device::available_devices() -> std::vector<Device> {
         res.push_back(Device::cuda(0));
     }
 #endif
-    if (Device::vulkan(0).is_available()) {
-        res.push_back(Device::vulkan(0));
-    }
     return res;
 }
 
 auto Device::default_device() -> Device {
     if (Device::cuda(0).is_available()) return Device::cuda(0);
-    if (Device::vulkan(0).is_available()) return Device::vulkan(0);
     if (Device::ispc().is_available()) return Device::ispc();
     return Device::cpu();
 }
@@ -91,7 +86,6 @@ auto Device::name() const -> std::string {
         case DeviceType::CPU:    base = "CPU"; break;
         case DeviceType::ISPC:   base = "ISPC"; break;
         case DeviceType::CUDA:   base = "CUDA"; break;
-        case DeviceType::VULKAN: base = "Vulkan"; break;
         default:                 base = "Unknown"; break;
     }
     if (_index > 0) {
@@ -129,11 +123,6 @@ auto Device::description() const -> std::string {
             }
         }
         return "NVIDIA CUDA Device";
-    }
-#endif
-#if defined(VELOMIND_ENABLE_VULKAN)
-    if (_type == DeviceType::VULKAN) {
-        return "Vulkan Compute Device";
     }
 #endif
     return "Unknown Device";

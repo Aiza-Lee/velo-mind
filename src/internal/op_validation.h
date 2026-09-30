@@ -190,7 +190,6 @@ inline void validate_backend_index_range(Op op, std::span<const pConstTensorStor
                                          const TensorStorage& out, DeviceType device) {
     std::size_t limit = std::numeric_limits<std::size_t>::max();
     if (device == DeviceType::ISPC) limit = std::numeric_limits<int>::max();
-    if (device == DeviceType::VULKAN) limit = std::numeric_limits<std::uint32_t>::max();
     if (limit != std::numeric_limits<std::size_t>::max()) {
         for (auto* tensor : in) {
             if (storage_numel(*tensor) > limit)

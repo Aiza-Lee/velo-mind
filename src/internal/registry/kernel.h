@@ -78,7 +78,7 @@ namespace velomind::internal {
         return true;                                                                     \
     }();
 
-// 非模板普通函数指针快捷注册宏（如 Vulkan 管线调度函数）
+// 非模板普通函数指针快捷注册宏
 #define VELOMIND_REGISTER_UNARY_FN(DEVICE, OP_ENUM, IN_DT, OUT_DT, FN)                   \
     VELOMIND_REGISTER_OP_KERNEL(                                                         \
         (DEVICE),                                                                        \

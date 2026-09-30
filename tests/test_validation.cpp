@@ -182,8 +182,7 @@ static void check_embedding_indices(DeviceType device) {
     Graph g;
     auto table = g.input({3, 2}, DataType::Float32);
     auto indices = g.input({2}, DataType::Int32);
-    auto generated = device == DeviceType::VULKAN
-        ? indices : g.op(OpDescriptor{Op::Reshape, ReshapeAttrs{{2}}}, indices);
+    auto generated = g.op(OpDescriptor{Op::Reshape, ReshapeAttrs{{2}}}, indices);
     auto y = g.op(Op::Embedding, table, generated);
     auto exec = g.build(device);
     table.copy_from_host(as_bytes(std::vector<float>{1, 2, 3, 4, 5, 6}));
@@ -208,9 +207,6 @@ TEST_CASE("Embedding index validation ISPC", "[validation][ispc]") { check_embed
 #endif
 #ifdef VELOMIND_ENABLE_CUDA
 TEST_CASE("Embedding index validation CUDA", "[validation][cuda]") { check_embedding_indices(DeviceType::CUDA); }
-#endif
-#ifdef VELOMIND_ENABLE_VULKAN
-TEST_CASE("Embedding index validation Vulkan", "[validation][vulkan]") { check_embedding_indices(DeviceType::VULKAN); }
 #endif
 
 TEST_CASE("Graph validates operator shape and attribute contracts", "[validation]") {

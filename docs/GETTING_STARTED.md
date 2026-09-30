@@ -10,9 +10,9 @@ VeloMind 使用标准 CMake Presets 组织构建配置。根据本地开发环�
 
 | 预设名称 (`preset`) | 说明 | 依赖要求 |
 | :--- | :--- | :--- |
-| **`release`** (推荐) | 全后端优化构建（启用 -O3 -DNDEBUG） | GCC/Clang, ISPC, CUDA Toolkit (可选), Vulkan SDK (可选) |
-| **`pure-cpu`** | 严格纯 CPU 构建，彻底禁用 CUDA、ISPC 与 Vulkan | 仅需标准 C++23 编译器 |
-| **`cpu-only`** | 仅启用 CPU、ISPC 与 Vulkan，不依赖 NVIDIA CUDA 工具链 | GCC/Clang, ISPC, Vulkan SDK |
+| **`release`** (推荐) | 全后端优化构建（启用 -O3 -DNDEBUG） | GCC/Clang, ISPC, CUDA Toolkit (可选) |
+| **`pure-cpu`** | 严格纯 CPU 构建，彻底禁用 CUDA 与 ISPC | 仅需标准 C++23 编译器 |
+| **`cpu-only`** | 仅启用 CPU 与 ISPC，不依赖 NVIDIA CUDA 工具链 | GCC/Clang, ISPC |
 | **`debug`** | 调试版本（-O0 -g），包含 CUDA 调试符号 | 调试工具链 |
 | **`asan`** | 启用 AddressSanitizer 与 UndefinedBehaviorSanitizer 内存检测 | Clang 或 GCC Sanitizer 库 |
 
@@ -43,14 +43,13 @@ cmake --build --preset release --target example_basic -j$(nproc)
 ./build/release/examples/example_basic --device cpu
 ./build/release/examples/example_basic --device ispc
 ./build/release/examples/example_basic --device cuda
-./build/release/examples/example_basic --device vulkan
 ```
 
 ---
 
 ## 3. LLM 端到端模型推理
 
-VeloMind 提供基于类 LLaMA 架构（SmolLM2 与 TinyLlama）的端到端自回归推理流水线，支持跨硬件后端（CPU / ISPC / CUDA / Vulkan）进行流式文本生成。
+VeloMind 提供基于类 LLaMA 架构（SmolLM2 与 TinyLlama）的端到端自回归推理流水线，支持跨硬件后端（CPU / ISPC / CUDA）进行流式文本生成。
 
 ### 3.1 模型资产准备
 
@@ -87,7 +86,6 @@ cmake --build --preset release --target download_smollm2
 ./build/release/examples/smollm2/smollm2_chat --device cpu
 ./build/release/examples/smollm2/smollm2_chat --device ispc
 ./build/release/examples/smollm2/smollm2_chat --device cuda
-./build/release/examples/smollm2/smollm2_chat --device vulkan
 
 # 单次非交互 Prompt 测试（生成完即退出）
 ./build/release/examples/smollm2/smollm2_chat --prompt "Once upon a time," --max 64

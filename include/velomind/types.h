@@ -32,9 +32,8 @@ enum class DeviceType : std::uint8_t {
     CPU,
     CUDA,
     ISPC,
-    VULKAN,
 
-    Last = VULKAN,
+    Last = ISPC,
 };
 
 constexpr std::size_t MAX_DEVICE_TYPES =
@@ -69,7 +68,6 @@ constexpr const char* device_type_name(DeviceType device) {
         case DeviceType::CPU:    return "CPU";
         case DeviceType::CUDA:   return "CUDA";
         case DeviceType::ISPC:   return "ISPC";
-        case DeviceType::VULKAN: return "Vulkan";
     }
     return "Unknown";
 }

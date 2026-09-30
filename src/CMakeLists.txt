@@ -50,10 +50,6 @@ if(VELOMIND_ENABLE_ISPC)
     add_subdirectory(ispc)
 endif()
 
-if(VELOMIND_ENABLE_VULKAN)
-    add_subdirectory(vulkan)
-endif()
-
 if(VELOMIND_ENABLE_ASAN)
     target_compile_options(velomind_core PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
     target_link_options(velomind_core PUBLIC -fsanitize=address,undefined)
